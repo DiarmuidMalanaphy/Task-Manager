@@ -118,6 +118,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 	case RequestTypeRemoveUser:
 		var r RemoveUserRequest
 		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		fmt.Println(r.Verification.Username)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -226,6 +227,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 	case RequestTypeRemoveTask:
 		var r RemoveTaskRequest
 		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		fmt.Println(r.Verification.Username)
 		if err != nil {
 			fmt.Println(err)
 			return

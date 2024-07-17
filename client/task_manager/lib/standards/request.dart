@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'utility.dart';
 
 
-
 class Request {
   final int type;
   final int payloadLength;
@@ -34,7 +33,7 @@ Uint8List serialiseRequest(int requestType, Uint8List payload) {
   return result;
 }
 
-Request? deserialiseRequest(Uint8List request_data) {
+Request deserialiseRequest(Uint8List request_data) {
   int type = request_data[0];
   int payloadLength = getUint32(request_data, 1);
   Uint8List payload = request_data.sublist(5, 5 + payloadLength);
