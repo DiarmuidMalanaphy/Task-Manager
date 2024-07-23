@@ -74,3 +74,20 @@ func NewTask_FromProtobuf(pbTask *pb.Task) Task {
 		Filtertwo:       pbTask.Filtertwo,
 	}
 }
+
+func (t *Task) ToProto() *pb.Task {
+	// Convert TaskDescription to a slice of bytes
+	taskDescriptionBytes := t.TaskDescription[:]
+
+	// Return the Protobuf Task message
+	return &pb.Task{
+		TaskID:          t.TaskID,
+		TaskName:        t.TaskName.ToProto(),
+		TargetUsername:  t.TargetUsername.ToProto(),
+		SetterUsername:  t.SetterUsername.ToProto(),
+		Status:          uint32(t.Status), // Protobuf uses uint32 for field types
+		TaskDescription: taskDescriptionBytes,
+		Filterone:       t.Filterone,
+		Filtertwo:       t.Filtertwo,
+	}
+}

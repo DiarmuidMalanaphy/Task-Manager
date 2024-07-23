@@ -88,8 +88,15 @@ type VerifyUserExistsRequest struct {
 
 func VerifyUserExistsRequest_FromProto(r *pb.VerifyUserExistsRequest) VerifyUserExistsRequest {
 	return VerifyUserExistsRequest{
-		Username: newUsername(r.Verification.Username),
+		Username: newUsername(r.Username),
 	}
+}
+
+func (r VerifyUserExistsRequest) ToProto() *pb.VerifyUserExistsRequest {
+	return &pb.VerifyUserExistsRequest{
+		Username: r.Username.ToProto(),
+	}
+
 }
 
 type UpdateUserRequest struct {
@@ -109,6 +116,13 @@ func PollUserRequest_FromProto(r *pb.PollUserRequest) PollUserRequest {
 	}
 }
 
+func (r PollUserRequest) ToProto() *pb.PollUserRequest {
+	return &pb.PollUserRequest{
+		Verification:   r.Verification.ToProto(),
+		LastseentaskID: r.LastSeenTaskID,
+	}
+}
+
 type AddTaskRequest struct {
 	Verification Verification
 	NewTask      Task
@@ -118,6 +132,13 @@ func AddTaskRequest_FromProto(r *pb.AddTaskRequest) AddTaskRequest {
 	return AddTaskRequest{
 		Verification: NewVerification_FromProtobuf(r.Verification),
 		NewTask:      NewTask_FromProtobuf(r.Newtask),
+	}
+}
+
+func (r AddTaskRequest) ToProto() *pb.AddTaskRequest {
+	return &pb.AddTaskRequest{
+		Verification : r.Verification.ToProto(),
+		Newtask: r.NewTask.ToProto(),
 	}
 }
 
@@ -133,6 +154,13 @@ func RemoveTaskRequest_FromProto(r *pb.RemoveTaskRequest) RemoveTaskRequest {
 	}
 }
 
+func (r RemoveTaskRequest) ToProto(r *pb.RemoveTaskRequest) *pb.RemoveTaskRequest {
+	return &pb.RemoveTaskRequest {
+		Verification : r.Verification.ToProto()
+		TaskID: r.TaskID,
+	}
+}
+
 type RemoveAllTasksRequest struct {
 	Verification Verification
 }
@@ -142,3 +170,5 @@ func RemoveAllTasksRequest_FromProto(r *pb.RemoveAllTasksRequest) RemoveAllTasks
 		Verification: NewVerification_FromProtobuf(r.Verification),
 	}
 }
+
+func 
