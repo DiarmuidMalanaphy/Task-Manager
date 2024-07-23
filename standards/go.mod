@@ -1,4 +1,4 @@
-module github.com/diarmuidmalanaphy/Task-Manager
+module github.com/diarmuidmalanaphy/Task-Manager/standards
 
 go 1.19
 
