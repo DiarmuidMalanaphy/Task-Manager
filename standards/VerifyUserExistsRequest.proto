@@ -3,9 +3,9 @@ syntax = "proto3";
 
 package taskmanager.pb;
 
-import "Verification.proto";
+import "Username.proto";
 option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 
 message VerifyUserExistsRequest {
-	Verification verification = 1;
+	Username username = 1;
 }
