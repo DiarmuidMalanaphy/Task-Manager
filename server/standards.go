@@ -1,16 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"encoding/gob"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 )
-
-type Hash [32]byte
-type Username [20]byte
-
-func (u *Username) toString() string {
-	return string(bytes.Trim(u[:], "\x00"))
-}
 
 func init() {
 	// Register the Username type with gob
@@ -22,8 +15,28 @@ type Verification struct {
 	Hash     Hash
 }
 
+func NewVerification_FromProtobuf(verification *pb.Verification) Verification {
+	return Verification{
+		Username: newUsername(verification.Username),
+		Hash:     NewHash_FromProtobuf(verification.Hash),
+	}
+}
+
+func (r Verification) ToProto() *pb.Verification {
+	return &pb.Verification{
+		Username: r.Username.ToProto(),
+		Hash:     r.Hash.ToProto(),
+	}
+}
+
 type Error struct {
 	ErrorMessage [60]byte
+}
+
+func (e Error) ToProto() pb.Error {
+	return pb.Error{
+		Error: e.ErrorMessage[:],
+	}
 }
 
 func NewError(message string) Error {
@@ -34,25 +47,66 @@ func NewError(message string) Error {
 
 type AddUserRequest struct {
 	Username Username
-	Password [30]byte
+	Password Password
+}
+
+func (r AddUserRequest) ToProto() *pb.AddUserRequest {
+	return &pb.AddUserRequest{
+		Username: r.Username.ToProto(),
+		Password: r.Password.ToProto(),
+	}
+}
+
+func AddUserRequest_FromProto(r *pb.AddUserRequest) AddUserRequest {
+	username := newUsername(r.Username)
+	password := passwordFromProtobuf(r)
+	return AddUserRequest{
+		Username: username,
+		Password: password,
+	}
 }
 
 type RemoveUserRequest struct {
 	Verification Verification
 }
 
+func (r RemoveUserRequest) ToProto() *pb.RemoveUserRequest {
+	return &pb.RemoveUserRequest{
+		Verification: r.Verification.ToProto(),
+	}
+}
+
+func RemoveUserRequest_FromProto(r *pb.RemoveUserRequest) RemoveUserRequest {
+	return RemoveUserRequest{
+		Verification: NewVerification_FromProtobuf(r.Verification),
+	}
+}
+
 type VerifyUserExistsRequest struct {
 	Username Username
+}
+
+func VerifyUserExistsRequest_FromProto(r *pb.VerifyUserExistsRequest) VerifyUserExistsRequest {
+	return VerifyUserExistsRequest{
+		Username: newUsername(r.Verification.Username),
+	}
 }
 
 type UpdateUserRequest struct {
 	Verification Verification
 	User         User
-}
+} // I am not handling this right now
 
 type PollUserRequest struct {
 	Verification   Verification
 	LastSeenTaskID uint32
+}
+
+func PollUserRequest_FromProto(r *pb.PollUserRequest) PollUserRequest {
+	return PollUserRequest{
+		Verification:   NewVerification_FromProtobuf(r.Verification),
+		LastSeenTaskID: r.LastseentaskID,
+	}
 }
 
 type AddTaskRequest struct {
@@ -60,11 +114,31 @@ type AddTaskRequest struct {
 	NewTask      Task
 }
 
+func AddTaskRequest_FromProto(r *pb.AddTaskRequest) AddTaskRequest {
+	return AddTaskRequest{
+		Verification: NewVerification_FromProtobuf(r.Verification),
+		NewTask:      NewTask_FromProtobuf(r.Newtask),
+	}
+}
+
 type RemoveTaskRequest struct {
 	Verification Verification
 	TaskID       uint64
 }
 
+func RemoveTaskRequest_FromProto(r *pb.RemoveTaskRequest) RemoveTaskRequest {
+	return RemoveTaskRequest{
+		Verification: NewVerification_FromProtobuf(r.Verification),
+		TaskID:       r.TaskID,
+	}
+}
+
 type RemoveAllTasksRequest struct {
 	Verification Verification
+}
+
+func RemoveAllTasksRequest_FromProto(r *pb.RemoveAllTasksRequest) RemoveAllTasksRequest {
+	return RemoveAllTasksRequest{
+		Verification: NewVerification_FromProtobuf(r.Verification),
+	}
 }

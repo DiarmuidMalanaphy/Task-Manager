@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 )
 
 type Uint128 struct {
@@ -50,4 +51,26 @@ func (t *Task) Flip_Task_State() *Task {
 	}
 	t.Status = 0
 	return t
+}
+func NewTask_FromProtobuf(pbTask *pb.Task) Task {
+	var taskDescription [120]byte
+	if len(pbTask.TaskDescription) > 120 { // To mitigate buffer overflow
+		// Username is too long, truncate and log a warning
+		copy(taskDescription[:], pbTask.TaskDescription[:120])
+		fmt.Printf("Warning: Description truncated from %d to 120 bytes\n", len(pbTask.TaskDescription))
+	} else {
+		// Username fits, copy it entirely
+		copy(taskDescription[:], pbTask.TaskDescription)
+	}
+
+	return Task{
+		TaskID:          pbTask.TaskID,
+		TaskName:        newUsername(pbTask.TaskName),
+		TargetUsername:  newUsername(pbTask.TargetUsername),
+		SetterUsername:  newUsername(pbTask.SetterUsername),
+		Status:          uint8(pbTask.Status),
+		TaskDescription: taskDescription,
+		Filterone:       pbTask.Filterone,
+		Filtertwo:       pbTask.Filtertwo,
+	}
 }

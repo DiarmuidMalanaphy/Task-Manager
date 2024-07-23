@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"fmt"
 	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 	networktool "github.com/DiarmuidMalanaphy/networktools"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -39,17 +38,6 @@ func main() {
 		}
 	}
 	listener.Stop()
-}
-
-func createHash(input string) Hash {
-	// Compute SHA-256 hash of the input
-	hashBytes := sha256.Sum256([]byte(input))
-
-	// Convert the hash to Hash type (which is [20]byte)
-	var hash Hash
-	copy(hash[:], hashBytes[:32])
-
-	return hash
 }
 
 type empty struct {
@@ -97,34 +85,34 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeAddUser:
-		var r AddUserRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		var protobuf_request pb.AddUserRequest
+		err := proto.Unmarshal(data.Request.Payload, &protobuf_request)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+		r := NewAddUserRequest(&protobuf_request)
 		if does_user_exist(r.Username, user_map) {
 			generate_and_send_error("Username already exists", data)
 			return
 		}
 
-		stringified_password := string(bytes.Trim(r.Password[:], "\x00"))
-
-		new_user := newUser(r.Username, createHash(stringified_password))
-
+		stringified_password := r.Password.toString()
+		new_user := NewUser_FromGo(r.Username, createHash(stringified_password))
 		user_map.Add(&new_user)
 		generate_and_send_success(data)
 		return
 
 	case RequestTypeRemoveUser:
-		var r RemoveUserRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
-		fmt.Println(r.Verification.Username)
+		var protobuf_request pb.RemoveUserRequest
+		err := proto.Unmarshal(data.Request.Payload, &protobuf_request)
+
 		if err != nil {
 			fmt.Println(err)
 			return
-
 		}
+		r := NewRemoveUserRequest(&protobuf_request)
+
 		if !does_user_exist(r.Verification.Username, user_map) {
 			generate_and_send_error("Username doesn't exist", data)
 			return
@@ -140,12 +128,15 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeVerifyUserExists:
-		var r VerifyUserExistsRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		var protobuf_request pb.VerifyUserExistsRequest
+
+		err := proto.Unmarshal(data.Request.Payload, &protobuf_request)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+
+		r := NewVerifyUserExistsRequest(&protobuf_request)
 
 		if !does_user_exist(r.Username, user_map) {
 			generate_and_send_error("Username doesn't exist", data)
