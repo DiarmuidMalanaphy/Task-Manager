@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package taskmanager.pb;
+
+import "Username.proto";
+import "Hash.proto";
+option go_package = "github.com/diarmuidmalanaphy/Task-Manager/standards";
+
+message Verification {
+	Username Username = 1;
+	Hash Hash = 2;
+}
+
