@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package taskmanager.pb;
+import "Verification.proto";
+import "Task.proto";
+option go_package = "github.com/diarmuidmalanaphy/Task-Manager/standards";
+
+message AddTaskRequest {
+	Verification verification = 1;
+	Task newtask = 2;
+}
+

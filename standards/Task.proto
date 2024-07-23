@@ -1,0 +1,18 @@
+
+syntax = "proto3";
+
+package taskmanager.pb;
+option go_package = "github.com/diarmuidmalanaphy/Task-Manager/standards";
+
+import "Username.proto";
+
+message Task {
+    uint64 taskID = 1;
+    Username taskName = 2; // Assuming Username is defined in Username.proto
+    Username targetUsername = 3; // Assuming Username is defined in Username.proto
+    Username setterUsername = 4; // Assuming Username is defined in Username.proto
+    uint32 status = 5;
+    bytes taskDescription = 6;
+    uint64 filterone = 7;
+    uint64 filtertwo = 8;
+}

@@ -1,0 +1,12 @@
+
+syntax = "proto3";
+
+package taskmanager.pb;
+
+option go_package = "github.com/diarmuidmalanaphy/Task-Manager/standards";
+import "Verification.proto";
+
+message RemoveUserRequest {
+	Verification verification = 1;
+}
+
