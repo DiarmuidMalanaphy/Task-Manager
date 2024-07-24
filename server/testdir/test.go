@@ -3,9 +3,10 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"crypto/sha256"
 	"fmt"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 	networktools "github.com/DiarmuidMalanaphy/networktools"
+	"google.golang.org/protobuf/proto"
 	"os"
 	"reflect"
 	"strconv"
@@ -26,27 +27,44 @@ func main() {
 	password, _ := reader.ReadString('\n')
 	password = strings.TrimSpace(password)
 
-	testUser := AddUserRequest{
+	protoUser := AddUserRequest{
 		Username: stringToUsername(username),
-		Password: stringToByteArray(password, 30),
-	}
+		Password: stringToPassword(password),
+	}.ToProto()
 
-	req, _ := networktools.GenerateRequest(testUser, 2)
-	data, _ := networktools.Handle_Single_TCP_Exchange("192.168.1.76:5050", req, 1024)
-	incoming_request, err := networktools.DeserialiseRequest(data)
-	fmt.Println(incoming_request.Type)
+	req, err := networktools.GenerateRequest(protoUser, 2)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error generating request:", err)
 		return
 	}
-	printError(incoming_request, "User Registered Successfully")
-	// Create verification objec
 
+	data, err := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
+	if err != nil {
+		fmt.Println("Error in TCP exchange:", err)
+		return
+	}
+
+	incoming_request, err := networktools.DeserialiseRequest(data)
+	if err != nil {
+		fmt.Println("Error deserializing request:", err)
+		return
+	}
+
+	fmt.Println(incoming_request.Type)
+	if incoming_request.Type == 255 {
+		err, _ := Error_FromProto(incoming_request.Payload)
+		printByteArrayAsString(err.ErrorMessage)
+	} else {
+		fmt.Println("User Registered Successfully")
+	}
+
+	// Create verification object
 	verification := Verification{
 		Username: stringToUsername(username),
 		Hash:     createHash(password),
 	}
 	fmt.Println(verification.Hash)
+
 	for {
 		fmt.Println("\n1. Add Task")
 		fmt.Println("2. Poll Tasks")
@@ -70,17 +88,6 @@ func main() {
 		default:
 			fmt.Println("Invalid option, please try again.")
 		}
-	}
-
-}
-func printError(req networktools.Request, good_string string) {
-	if req.Type == 255 {
-		var e Error
-		networktools.DeserialiseData(&e, req.Payload)
-		printByteArrayAsString(e.ErrorMessage)
-	} else {
-		fmt.Println(good_string)
-
 	}
 }
 
@@ -111,11 +118,13 @@ func addTask(reader *bufio.Reader, verification Verification) {
 		NewTask:      task,
 	}
 
-	req, _ := networktools.GenerateRequest(addTaskRequest, 16)
-	data, _ := networktools.Handle_Single_TCP_Exchange("192.168.1.76:5050", req, 1024)
+	protoAddTaskRequest := addTaskRequest.ToProto()
+
+	req, _ := networktools.GenerateRequest(protoAddTaskRequest, 16)
+
+	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
 	response, _ := networktools.DeserialiseRequest(data)
 	printError(response, "Successfully added task")
-
 }
 
 func removeTask(reader *bufio.Reader, verification Verification) {
@@ -134,8 +143,10 @@ func removeTask(reader *bufio.Reader, verification Verification) {
 		TaskID:       taskID,
 	}
 
-	req, _ := networktools.GenerateRequest(removeTaskRequest, 17)
-	data, _ := networktools.Handle_Single_TCP_Exchange("192.168.1.76:5050", req, 1024)
+	protoRemoveTaskRequest := removeTaskRequest.ToProto()
+
+	req, _ := networktools.GenerateRequest(protoRemoveTaskRequest, 17)
+	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
 	response, _ := networktools.DeserialiseRequest(data)
 	printError(response, "Successfully removed task")
 }
@@ -145,29 +156,52 @@ func pollTasks(reader *bufio.Reader, verification Verification) {
 	lastSeenIDStr, _ := reader.ReadString('\n')
 	lastSeenIDStr = strings.TrimSpace(lastSeenIDStr)
 
-	lastSeenID, err := strconv.ParseUint(lastSeenIDStr, 10, 64)
+	lastSeenID, err := strconv.ParseUint(lastSeenIDStr, 10, 32)
 	if err != nil {
 		fmt.Println("Invalid input. Using 0 as the last seen task ID.")
 		lastSeenID = 0
 	}
 	pollRequest := PollUserRequest{
 		Verification:   verification,
-		LastSeenTaskID: lastSeenID, // Poll all tasks
+		LastSeenTaskID: uint32(lastSeenID),
 	}
 
-	req, _ := networktools.GenerateRequest(pollRequest, 15)
-	data, _ := networktools.Handle_Single_TCP_Exchange("192.168.1.76:5050", req, 1024)
+	protoPollRequest := pollRequest.ToProto()
+
+	req, _ := networktools.GenerateRequest(protoPollRequest, 15)
+	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
 	response, _ := networktools.DeserialiseRequest(data)
 
-	var tasks []Task
-	err = networktools.DeserialiseData(&tasks, response.Payload)
-	if err != nil {
-		fmt.Println("Error retrieving tasks:", err)
+	if response.Type == 255 {
+		err, _ := Error_FromProto(response.Payload)
+		printByteArrayAsString(err.ErrorMessage)
 		return
 	}
-	printError(response, "Successfully registered tasks")
+
+	var taskList pb.TaskList
+	err = proto.Unmarshal(response.Payload, &taskList)
+	if err != nil {
+		fmt.Println("Error unmarshaling task list:", err)
+		return
+	}
+
+	tasks := make([]Task, len(taskList.Tasks))
+	for i, protoTask := range taskList.Tasks {
+		tasks[i] = Task_FromProto(protoTask)
+	}
 
 	printTasks(tasks)
+}
+
+func printError(req networktools.Request_Type, good_string string) {
+	if req.Type == 255 {
+		err, _ := Error_FromProto(req.Payload)
+
+		printByteArrayAsString(err.ErrorMessage)
+	} else {
+		fmt.Println(good_string)
+
+	}
 }
 
 func printTasks(tasks []Task) {
@@ -184,16 +218,6 @@ func printTasks(tasks []Task) {
 	}
 }
 
-// Implement createHash function based on your Hash type
-func createHash(password string) Hash {
-
-	hashBytes := sha256.Sum256([]byte(password))
-
-	// This is a placeholder. Implement actual hash function.
-	var hash Hash
-	copy(hash[:], hashBytes[:32])
-	return hash
-}
 func printByteArrayAsString(arr interface{}) {
 	value := reflect.ValueOf(arr)
 	if value.Kind() != reflect.Array {
@@ -237,6 +261,12 @@ func stringToUsername(s string) Username {
 	var username [20]byte
 	copy(username[:], s)
 	return username
+}
+
+func stringToPassword(s string) Password {
+	var password [30]byte
+	copy(password[:], s)
+	return password
 }
 
 // The printTasks function remains the same as in your original code

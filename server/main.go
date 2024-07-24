@@ -4,7 +4,6 @@ import (
 	"fmt"
 	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 	networktool "github.com/DiarmuidMalanaphy/networktools"
-	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -85,13 +84,13 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeAddUser:
-		var protobuf_request pb.AddUserRequest
-		err := proto.Unmarshal(data.Request.Payload, &protobuf_request)
+		r, err := AddUserRequest_FromProto(data.Request.Payload)
+
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		r := AddUserRequest_FromProto(&protobuf_request)
+
 		if does_user_exist(r.Username, user_map) {
 			generate_and_send_error("Username already exists", data)
 			return
@@ -104,15 +103,11 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeRemoveUser:
-		var protobuf_request pb.RemoveUserRequest
-		err := proto.Unmarshal(data.Request.Payload, &protobuf_request)
-
+		r, err := RemoveUserRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		r := RemoveUserRequest_FromProto(&protobuf_request)
-
 		if !does_user_exist(r.Verification.Username, user_map) {
 			generate_and_send_error("Username doesn't exist", data)
 			return
@@ -128,15 +123,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeVerifyUserExists:
-		var protobuf_request pb.VerifyUserExistsRequest
 
-		err := proto.Unmarshal(data.Request.Payload, &protobuf_request)
+		r, err := VerifyUserExistsRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-
-		r := VerifyUserExistsRequest_FromProto(&protobuf_request)
 
 		if !does_user_exist(r.Username, user_map) {
 			generate_and_send_error("Username doesn't exist", data)
@@ -147,18 +139,17 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypePollUser:
-		fmt.Println("polling")
-		var t PollUserRequest
-		err := networktool.DeserialiseData(&t, data.Request.Payload)
+		t, err := PollUserRequest_FromProto(data.Request.Payload)
+
 		if err != nil {
 			fmt.Println(err)
+			return
 		}
 
 		if !does_user_exist(t.Verification.Username, user_map) {
 			generate_and_send_error("Sender username isn't registered", data)
 			return
 		}
-		fmt.Println("BB")
 		if !user_map.Verify(t.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
@@ -168,9 +159,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		taskList := &pb.TaskList{
 			Tasks: make([]*pb.Task, 0, len(tasks)),
 		}
+		for _, task := range tasks {
+			pbTask := task.ToProto()
+			taskList.Tasks = append(taskList.Tasks, pbTask)
+		}
+		outgoing_req, err := networktool.GenerateRequest(taskList, RequestSuccessful)
 
-		outgoing_req, err := networktool.GenerateRequest(tasks, RequestSuccessful)
-		fmt.Println("Worked")
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -180,8 +174,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 
 	case RequestTypeAddTask:
 		fmt.Println("Add Task")
-		var r AddTaskRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		r, err := AddTaskRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -221,8 +214,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeRemoveTask:
-		var r RemoveTaskRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		r, err := RemoveTaskRequest_FromProto(data.Request.Payload)
 		fmt.Println(r.Verification.Username)
 		if err != nil {
 			fmt.Println(err)
@@ -242,8 +234,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeRemoveAllTasks:
-		var r RemoveAllTasksRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		r, err := RemoveAllTasksRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -262,8 +253,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeFlipTaskState:
-		var r RemoveTaskRequest
-		err := networktool.DeserialiseData(&r, data.Request.Payload)
+		r, err := RemoveTaskRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -305,7 +295,7 @@ func generate_and_send_error(error_message string, data networktool.TCPNetworkDa
 }
 
 func generate_and_send_success(data networktool.TCPNetworkData) {
-	outgoing_req, err := networktool.GenerateRequest(get_small_meaningless_data(), RequestSuccessful)
+	outgoing_req, err := networktool.GenerateRequest(nil, RequestSuccessful)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -324,7 +314,7 @@ func stringToUserName(u string) Username {
 func generate_error(error_string string) ([]byte, error) {
 	if len(error_string) < 60 {
 
-		generated_error := NewError(error_string)
+		generated_error := NewError(error_string).ToProto()
 		return networktool.GenerateRequest(generated_error, RequestFailure)
 	} else {
 		err := fmt.Errorf("Error String too large")

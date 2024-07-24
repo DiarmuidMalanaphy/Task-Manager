@@ -14,8 +14,8 @@ type User struct {
 }
 
 func NewUser_FromProtobuf(username *pb.Username, hash *pb.Hash) User {
-	usernameByte := newUsername(username)
-	hashByte := NewHash_FromProtobuf(hash)
+	usernameByte := Username_FromProto(username)
+	hashByte := Hash_FromProto(hash)
 	return User{
 		Username:    usernameByte,
 		Hash:        hashByte,

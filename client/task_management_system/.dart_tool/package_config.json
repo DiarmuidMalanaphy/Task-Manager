@@ -182,10 +182,10 @@
       "languageVersion": "3.4"
     }
   ],
-  "generated": "2024-07-19T12:08:48.327772Z",
+  "generated": "2024-07-24T12:45:12.100007Z",
   "generator": "pub",
-  "generatorVersion": "3.4.3",
+  "generatorVersion": "3.4.4",
   "flutterRoot": "file:///home/diarmuid/snap/flutter/common/flutter",
-  "flutterVersion": "3.22.2",
+  "flutterVersion": "3.22.3",
   "pubCache": "file:///home/diarmuid/.pub-cache"
 }
