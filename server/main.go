@@ -91,7 +91,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-		r := NewAddUserRequest(&protobuf_request)
+		r := AddUserRequest_FromProto(&protobuf_request)
 		if does_user_exist(r.Username, user_map) {
 			generate_and_send_error("Username already exists", data)
 			return
@@ -111,7 +111,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-		r := NewRemoveUserRequest(&protobuf_request)
+		r := RemoveUserRequest_FromProto(&protobuf_request)
 
 		if !does_user_exist(r.Verification.Username, user_map) {
 			generate_and_send_error("Username doesn't exist", data)
@@ -136,7 +136,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			return
 		}
 
-		r := NewVerifyUserExistsRequest(&protobuf_request)
+		r := VerifyUserExistsRequest_FromProto(&protobuf_request)
 
 		if !does_user_exist(r.Username, user_map) {
 			generate_and_send_error("Username doesn't exist", data)

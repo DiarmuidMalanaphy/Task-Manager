@@ -15,7 +15,7 @@ type Verification struct {
 	Hash     Hash
 }
 
-func NewVerification_FromProtobuf(verification *pb.Verification) Verification {
+func Verification_FromProto(verification *pb.Verification) Verification {
 	return Verification{
 		Username: newUsername(verification.Username),
 		Hash:     NewHash_FromProtobuf(verification.Hash),
@@ -78,7 +78,7 @@ func (r RemoveUserRequest) ToProto() *pb.RemoveUserRequest {
 
 func RemoveUserRequest_FromProto(r *pb.RemoveUserRequest) RemoveUserRequest {
 	return RemoveUserRequest{
-		Verification: NewVerification_FromProtobuf(r.Verification),
+		Verification: Verification_FromProto(r.Verification),
 	}
 }
 
@@ -111,7 +111,7 @@ type PollUserRequest struct {
 
 func PollUserRequest_FromProto(r *pb.PollUserRequest) PollUserRequest {
 	return PollUserRequest{
-		Verification:   NewVerification_FromProtobuf(r.Verification),
+		Verification:   Verification_FromProto(r.Verification),
 		LastSeenTaskID: r.LastseentaskID,
 	}
 }
@@ -130,15 +130,15 @@ type AddTaskRequest struct {
 
 func AddTaskRequest_FromProto(r *pb.AddTaskRequest) AddTaskRequest {
 	return AddTaskRequest{
-		Verification: NewVerification_FromProtobuf(r.Verification),
+		Verification: Verification_FromProto(r.Verification),
 		NewTask:      NewTask_FromProtobuf(r.Newtask),
 	}
 }
 
 func (r AddTaskRequest) ToProto() *pb.AddTaskRequest {
 	return &pb.AddTaskRequest{
-		Verification : r.Verification.ToProto(),
-		Newtask: r.NewTask.ToProto(),
+		Verification: r.Verification.ToProto(),
+		Newtask:      r.NewTask.ToProto(),
 	}
 }
 
@@ -149,15 +149,15 @@ type RemoveTaskRequest struct {
 
 func RemoveTaskRequest_FromProto(r *pb.RemoveTaskRequest) RemoveTaskRequest {
 	return RemoveTaskRequest{
-		Verification: NewVerification_FromProtobuf(r.Verification),
+		Verification: Verification_FromProto(r.Verification),
 		TaskID:       r.TaskID,
 	}
 }
 
-func (r RemoveTaskRequest) ToProto(r *pb.RemoveTaskRequest) *pb.RemoveTaskRequest {
-	return &pb.RemoveTaskRequest {
-		Verification : r.Verification.ToProto()
-		TaskID: r.TaskID,
+func (r RemoveTaskRequest) ToProto() *pb.RemoveTaskRequest {
+	return &pb.RemoveTaskRequest{
+		Verification: r.Verification.ToProto(),
+		TaskID:       r.TaskID,
 	}
 }
 
@@ -167,8 +167,6 @@ type RemoveAllTasksRequest struct {
 
 func RemoveAllTasksRequest_FromProto(r *pb.RemoveAllTasksRequest) RemoveAllTasksRequest {
 	return RemoveAllTasksRequest{
-		Verification: NewVerification_FromProtobuf(r.Verification),
+		Verification: Verification_FromProto(r.Verification),
 	}
 }
-
-func 
