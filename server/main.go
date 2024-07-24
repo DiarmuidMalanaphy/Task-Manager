@@ -165,6 +165,10 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		}
 		user := user_map.Value(t.Verification.Username.toString())
 		tasks, err := user.GetTasksAfter(uint64(t.LastSeenTaskID))
+		taskList := &pb.TaskList{
+			Tasks: make([]*pb.Task, 0, len(tasks)),
+		}
+
 		outgoing_req, err := networktool.GenerateRequest(tasks, RequestSuccessful)
 		fmt.Println("Worked")
 		if err != nil {

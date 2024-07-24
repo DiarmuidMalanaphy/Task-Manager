@@ -16,3 +16,7 @@ message Task {
     uint64 filterone = 7;
     uint64 filtertwo = 8;
 }
+
+message TaskList {
+    repeated Task tasks = 1;
+}
