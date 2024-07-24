@@ -4,7 +4,7 @@ package taskmanager.pb;
 
 import "Username.proto";
 import "Hash.proto";
-option go_package = "github.com/diarmuidmalanaphy/Task-Manager/standards";
+option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 
 message Verification {
 	Username Username = 1;

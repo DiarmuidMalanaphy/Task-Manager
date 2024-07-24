@@ -3,7 +3,7 @@ syntax = "proto3";
 package taskmanager.pb;
 import "Username.proto";
 
-option go_package = "github.com/diarmuidmalanaphy/Task-Manager/standards";
+option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 message AddUserRequest {
 	Username username = 1;
 	bytes password = 2;
