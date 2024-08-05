@@ -35,17 +35,19 @@ func LoadPreexisingUserMap() *UserMap {
 		}
 	}
 	return &UserMap{
-		Map: user_map,
+		Map:       user_map,
+		usercount: largest_ID,
 	}
 }
 
 func (um *UserMap) Add(user *User) error {
+	fmt.Println(um.usercount)
 	user_id := um.IncUserCount()
 	um.mu.Lock()
 	user.UserID = user_id
 
 	um.Map[(user.Username).toString()] = user
-	err := writeUserToDB(*user)
+	err := writeUserToDB(user)
 	um.mu.Unlock()
 
 	return err

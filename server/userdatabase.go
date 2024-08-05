@@ -21,7 +21,7 @@ func initUserDB() error {
 	})
 }
 
-func writeUserToDB(user User) error {
+func writeUserToDB(user *User) error {
 	return userDB.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte("Users"))
 		var buf bytes.Buffer

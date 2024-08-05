@@ -1,21 +1,22 @@
 import 'dart:typed_data';
+import '../dartproto/Task.pb.dart';
+import '../dartproto/Username.pb.dart';
 import 'base.dart';
-import 'utility.dart';
-import 'datatypes.dart';
+import 'package:fixnum/fixnum.dart';
 
-class Task {
+class Task_Type {
   static const int SIZE = 8 + 20 + 20 + 20 + 1 + 120 + 8 + 8; // 205 bytes total
 
-  final int taskID; //Uint64
-  final Uint8List taskName;
-  final Uint8List targetUsername;
-  final Uint8List setterUsername;
-  final int status; //Uint8
+  final Int64 taskID; //Uint64
+  final Username_Type taskName;
+  final Username_Type targetUsername;
+  final Username_Type setterUsername;
   final Uint8List taskDescription;
-  final int filterOne;
-  final int filterTwo;
+  int status; //Uint8
+  final Int64 filterOne;
+  final Int64 filterTwo;
 
-  Task(
+  Task_Type(
     this.taskID,
     this.taskName,
     this.targetUsername,
@@ -51,98 +52,62 @@ class Task {
     if (filterNumber < 0 || filterNumber >= 128) {
       throw ArgumentError('Filter number must be between 0 and 127');
     }
-
-    int filter = (filterNumber < 64) ? filterOne : filterTwo;
+    Int64 filter = (filterNumber < 64) ? filterOne : filterTwo;
     int bitPosition = filterNumber % 64;
 
     return (filter & (1 << bitPosition)) != 0;
   }
 
-  Uint8List serialize() {
-    final buffer = ByteData(SIZE);
-    var offset = 0;
-
-    buffer.setUint64(offset, taskID, Endian.little);
-    offset += 8;
-
-    buffer.buffer.asUint8List(offset, 20).setAll(0, taskName);
-    offset += 20;
-
-    buffer.buffer.asUint8List(offset, 20).setAll(0, targetUsername);
-    offset += 20;
-
-    buffer.buffer.asUint8List(offset, 20).setAll(0, setterUsername);
-    offset += 20;
-
-    buffer.setUint8(offset, status);
-    offset += 1;
-
-    buffer.buffer.asUint8List(offset, 120).setAll(0, taskDescription);
-    offset += 120;
-
-    buffer.setUint64(offset, filterOne, Endian.little);
-    offset += 8;
-
-    buffer.setUint64(offset, filterTwo, Endian.little);
-
-    return buffer.buffer.asUint8List();
+  static Task_Type fromProto(Task protoTask) {
+    return Task_Type(
+      protoTask.taskID,
+      Username_Type.fromProto(protoTask.taskName),
+      Username_Type.fromProto(protoTask.targetUsername),
+      Username_Type.fromProto(protoTask.setterUsername),
+      protoTask.status,
+      Uint8List.fromList(protoTask.taskDescription),
+      protoTask.filterone,
+      protoTask.filtertwo,
+    );
   }
 
-  static Task deserialize(Uint8List data) {
-    if (data.length != SIZE) {
-      throw ArgumentError('Invalid data length for Task deserialization');
-    }
+  Task get toProto {
+    final task = Task()
+      ..taskID = taskID
+      ..taskName = (Username()..username = taskName.bytes)
+      ..targetUsername = (Username()..username = targetUsername.bytes)
+      ..setterUsername = (Username()..username = setterUsername.bytes)
+      ..status = status
+      ..taskDescription = taskDescription
+      ..filterone = filterOne
+      ..filtertwo = filterTwo;
 
-    final buffer = ByteData.view(data.buffer);
-    var offset = 0;
+    return task;
+  }
 
-    final taskID = buffer.getUint64(offset, Endian.little);
-    offset += 8;
+  Uint8List serialize() {
+    final task = Task()
+      ..taskID = taskID
+      ..taskName = (Username()..username = taskName.bytes)
+      ..targetUsername = (Username()..username = targetUsername.bytes)
+      ..setterUsername = (Username()..username = setterUsername.bytes)
+      ..status = status
+      ..taskDescription = taskDescription
+      ..filterone = filterOne
+      ..filtertwo = filterTwo;
 
-    final taskName = data.sublist(offset, offset + 20);
-    offset += 20;
-
-    final targetUsername = data.sublist(offset, offset + 20);
-    offset += 20;
-
-    final setterUsername = data.sublist(offset, offset + 20);
-    offset += 20;
-
-    final status = buffer.getUint8(offset);
-    offset += 1;
-
-    final taskDescription = data.sublist(offset, offset + 120);
-    offset += 120;
-
-    final filterOne = buffer.getUint64(offset, Endian.little);
-    offset += 8;
-
-    final filterTwo = buffer.getUint64(offset, Endian.little);
-
-    return Task(
-      taskID,
-      taskName,
-      targetUsername,
-      setterUsername,
-      status,
-      taskDescription,
-      filterOne,
-      filterTwo,
-    );
+    return task.writeToBuffer();
   }
 }
 
-List<Task> deserialiseTaskList(Uint8List payload) {
-  if (payload.length % Task.SIZE != 0) {
-    throw ArgumentError('Invalid payload length for Task list deserialization');
+List<Task_Type> deserialiseTasks(Uint8List payload) {
+  try {
+    print("HEREE?");
+    final taskList = TaskList.fromBuffer(payload);
+    print(taskList);
+    return taskList.tasks.map((task) => Task_Type.fromProto(task)).toList();
+  } catch (e) {
+    print('Error deserializing TaskList: $e');
+    return [];
   }
-
-  List<Task> taskList = [];
-  for (int i = 0; i < payload.length; i += Task.SIZE) {
-    Uint8List taskData = payload.sublist(i, i + Task.SIZE);
-    Task task = Task.deserialize(taskData);
-    taskList.add(task);
-  }
-
-  return taskList;
 }

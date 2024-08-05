@@ -12,6 +12,7 @@ const (
 	RequestTypeRemoveUser       = uint8(3)
 	RequestTypeVerifyUserExists = uint8(4)
 	RequestTypeUpdateUser       = uint8(5)
+	RequestTypeLoginUser        = uint8(6)
 
 	RequestTypePollUser       = uint8(15)
 	RequestTypeAddTask        = uint8(16)
@@ -19,7 +20,9 @@ const (
 	RequestTypeRemoveAllTasks = uint8(18)
 	RequestTypeUpdateTask     = uint8(19)
 	RequestTypeFlipTaskState  = uint8(20)
-	RequestSuccessful         = uint8(200)
+
+	RequestDefaultSuccessful  = uint8(200)
+	RequestNoReturnSuccessful = uint8(220)
 	RequestFailure            = uint8(255)
 )
 
@@ -27,8 +30,7 @@ func main() {
 	initTaskDB()
 	initUserDB()
 	user_map := LoadPreexisingUserMap()
-
-	request_channel, listener := networktool.Create_TCP_Listener(5050)
+	request_channel, _ := networktool.Create_TCP_Listener(5050)
 
 	for {
 		select {
@@ -36,7 +38,6 @@ func main() {
 			handle_TCP_requests(data, user_map)
 		}
 	}
-	listener.Stop()
 }
 
 type empty struct {
@@ -77,7 +78,7 @@ func get_small_meaningless_data() empty {
 // Return a success or failure
 
 func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
-	fmt.Println(data.Request.Type)
+	fmt.Printf("Received Request-Type: %d\n", data.Request.Type)
 	switch data.Request.Type {
 	case RequestTypePollAlive:
 		generate_and_send_success(data)
@@ -159,17 +160,41 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		taskList := &pb.TaskList{
 			Tasks: make([]*pb.Task, 0, len(tasks)),
 		}
-		for _, task := range tasks {
+		for i := 0; i < len(tasks); i++ {
+			task := tasks[i]
 			pbTask := task.ToProto()
 			taskList.Tasks = append(taskList.Tasks, pbTask)
+			fmt.Println(task.TargetUsername.toString())
 		}
-		outgoing_req, err := networktool.GenerateRequest(taskList, RequestSuccessful)
+		var outgoing_req []byte
+		if len(tasks) == 0 {
+			outgoing_req, err = networktool.GenerateRequest(taskList, RequestNoReturnSuccessful) //If the length is none there is no payload`
 
+		} else {
+			outgoing_req, err = networktool.GenerateRequest(taskList, RequestDefaultSuccessful)
+
+		}
+
+		networktool.SendTCPReply(data.Conn, outgoing_req)
+		return
+
+	case RequestTypeLoginUser:
+		fmt.Println("Login")
+		r, err := LoginRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		networktool.SendTCPReply(data.Conn, outgoing_req)
+		if !does_user_exist(r.Verification.Username, user_map) {
+			generate_and_send_error("Username doesn't exist", data)
+			return
+		}
+
+		if !user_map.Verify(r.Verification) {
+			generate_and_send_error("Incorrect Username or Password", data)
+			return
+		}
+		generate_and_send_success(data)
 		return
 
 	case RequestTypeAddTask:
@@ -184,7 +209,6 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			generate_and_send_error("Sender username isn't registered", data)
 			return
 		}
-		fmt.Println(user_map.Verify(r.Verification))
 		if !user_map.Verify(r.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
@@ -253,6 +277,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeFlipTaskState:
+		fmt.Println("flipping")
 		r, err := RemoveTaskRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
@@ -268,6 +293,8 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		}
 		user := user_map.Value(r.Verification.Username.toString())
 		flipTaskState(user.UserID, r.TaskID)
+		generate_and_send_success(data)
+		return
 
 	}
 
@@ -295,7 +322,7 @@ func generate_and_send_error(error_message string, data networktool.TCPNetworkDa
 }
 
 func generate_and_send_success(data networktool.TCPNetworkData) {
-	outgoing_req, err := networktool.GenerateRequest(nil, RequestSuccessful)
+	outgoing_req, err := networktool.GenerateRequest(nil, RequestNoReturnSuccessful)
 	if err != nil {
 		fmt.Println(err)
 	}

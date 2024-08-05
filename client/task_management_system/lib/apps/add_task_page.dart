@@ -1,21 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:task_management_system/networking/standards/base.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
-import 'package:task_management_system/networking/standards/Task.dart';
-import 'package:task_management_system/networking/standards/utility.dart';
-import 'dart:async';
-
-enum TaskFilter {
-  Filter1,
-  Filter2,
-  Filter3,
-  Filter4,
-  Filter5,
-  Filter6,
-  Filter7,
-  Filter8
-}
 
 class AddTaskPage extends StatefulWidget {
   final TaskManagementSystem tms;
@@ -31,9 +17,19 @@ class _AddTaskPageState extends State<AddTaskPage> {
   final _taskNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _targetUsernameController = TextEditingController();
-  Set<TaskFilter> _selectedFilters = Set<TaskFilter>();
+  Set<int> _selectedFilters = Set<int>();
   bool _isUserVerified = true;
   bool _isAddingToOtherUser = false;
+
+  List<String> filterNames = [
+    'Urgent',
+    'Important',
+    'Work',
+    'Phone',
+    'Laptop',
+    '30 Minutes',
+    '15 Minutes'
+  ];
 
   @override
   void initState() {
@@ -70,8 +66,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
             TextFormField(
               controller: _descriptionController,
               decoration: InputDecoration(labelText: 'Task Description'),
-              maxLines: null, // This allows the field to grow
-              minLines: 1, // This sets the initial height
+              maxLines: null,
+              minLines: 1,
               keyboardType: TextInputType.multiline,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(120),
@@ -80,40 +76,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
             ),
             SizedBox(height: 16),
             Text('Filters:'),
-            DropdownButton<TaskFilter>(
-              isExpanded: true,
-              hint: Text('Select filters'),
-              items: TaskFilter.values.map((TaskFilter filter) {
-                return DropdownMenuItem<TaskFilter>(
-                  value: filter,
-                  child: Text(filter.toString().split('.').last),
-                );
-              }).toList(),
-              onChanged: (TaskFilter? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    if (_selectedFilters.contains(newValue)) {
-                      _selectedFilters.remove(newValue);
-                    } else {
-                      _selectedFilters.add(newValue);
-                    }
-                  });
-                }
-              },
-            ),
-            Wrap(
-              spacing: 8.0,
-              children: _selectedFilters.map((filter) {
-                return Chip(
-                  label: Text(filter.toString().split('.').last),
-                  onDeleted: () {
-                    setState(() {
-                      _selectedFilters.remove(filter);
-                    });
-                  },
-                );
-              }).toList(),
-            ),
+            _buildFilterChips(),
             SizedBox(height: 16),
             Row(
               children: [
@@ -156,7 +119,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 onChanged: (value) {
                   if (value != widget.tms.verification.username.toString()) {
                     _isUserVerified = false;
-                    // Debounce the verification call
                     _debounceVerifyUser();
                   } else {
                     setState(() {
@@ -184,6 +146,27 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
   }
 
+  Widget _buildFilterChips() {
+    return Wrap(
+      spacing: 8.0,
+      children: List.generate(filterNames.length, (index) {
+        return FilterChip(
+          label: Text(filterNames[index]),
+          selected: _selectedFilters.contains(index),
+          onSelected: (bool selected) {
+            setState(() {
+              if (selected) {
+                _selectedFilters.add(index);
+              } else {
+                _selectedFilters.remove(index);
+              }
+            });
+          },
+        );
+      }),
+    );
+  }
+
   Timer? _debounceTimer;
 
   void _debounceVerifyUser() {
@@ -202,7 +185,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         _targetUsernameController.text !=
             widget.tms.verification.username.toString()) {
       bool userExists =
-          await widget.tms.verify_user_exists(_targetUsernameController.text);
+          await widget.tms.verifyUserExists(_targetUsernameController.text);
       setState(() {
         _isUserVerified = userExists;
       });
@@ -237,8 +220,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   int _combineFilters() {
     int result = 0;
-    for (TaskFilter filter in _selectedFilters) {
-      result |= (1 << filter.index);
+    for (int filterIndex in _selectedFilters) {
+      result |= (2 << filterIndex);
     }
     return result;
   }

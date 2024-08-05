@@ -50,6 +50,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "fixnum",
+      "rootUri": "file:///home/diarmuid/.pub-cache/hosted/pub.dev/fixnum-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "flutter",
       "rootUri": "file:///home/diarmuid/snap/flutter/common/flutter/packages/flutter",
       "packageUri": "lib/",
@@ -114,6 +120,12 @@
       "rootUri": "file:///home/diarmuid/.pub-cache/hosted/pub.dev/path-1.9.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "protobuf",
+      "rootUri": "file:///home/diarmuid/.pub-cache/hosted/pub.dev/protobuf-3.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "sky_engine",
@@ -182,7 +194,7 @@
       "languageVersion": "3.4"
     }
   ],
-  "generated": "2024-07-24T12:45:12.100007Z",
+  "generated": "2024-08-04T21:10:38.083926Z",
   "generator": "pub",
   "generatorVersion": "3.4.4",
   "flutterRoot": "file:///home/diarmuid/snap/flutter/common/flutter",

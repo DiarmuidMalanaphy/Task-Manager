@@ -12,7 +12,7 @@ type Uint128 struct {
 }
 
 func (u *Uint128) Print() {
-	fmt.Println("%d-%d", u.High, u.Low)
+	fmt.Printf("%d-%d", u.High, u.Low)
 }
 
 func (u *Uint128) Uint128ToBytes() []byte {
@@ -44,7 +44,7 @@ func (t *Task) Generate_globally_unique_task_ID(userID uint64) *Uint128 {
 
 func (t *Task) Flip_Task_State() *Task {
 	// Essentially it just flips the state (I'm lazy)
-
+	// 0 IS PENDING
 	if t.Status == 0 {
 		t.Status = 1
 		return t

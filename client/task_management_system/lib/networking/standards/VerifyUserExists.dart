@@ -1,20 +1,15 @@
 import 'base.dart';
 import 'dart:typed_data';
+import '../dartproto/VerifyUserExistsRequest.pb.dart';
 
-class VerifyUserExistsRequest {
-  final Username username;
+class VerifyUserExistsRequest_Type {
+  final Username_Type username;
 
-  VerifyUserExistsRequest(this.username);
-}
+  VerifyUserExistsRequest_Type(this.username);
 
-Uint8List serializeVerifyUserExistsRequest(VerifyUserExistsRequest request) {
-  return request.username.bytes;
-}
-
-VerifyUserExistsRequest? deserializeVerifyUserExistsRequest(
-    Uint8List? payload) {
-  if (payload != null && payload.length == 20) {
-    return VerifyUserExistsRequest(Username.fromBytes(payload));
+  Uint8List get serialise {
+    final addTaskRequest = VerifyUserExistsRequest()
+      ..username = username.toProto;
+    return addTaskRequest.writeToBuffer();
   }
-  return null;
 }

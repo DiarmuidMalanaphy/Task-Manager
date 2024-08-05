@@ -38,7 +38,7 @@ func main() {
 		return
 	}
 
-	data, err := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
+	data, err := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 10240)
 	if err != nil {
 		fmt.Println("Error in TCP exchange:", err)
 		return
@@ -122,7 +122,7 @@ func addTask(reader *bufio.Reader, verification Verification) {
 
 	req, _ := networktools.GenerateRequest(protoAddTaskRequest, 16)
 
-	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
+	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 10240)
 	response, _ := networktools.DeserialiseRequest(data)
 	printError(response, "Successfully added task")
 }
@@ -146,7 +146,7 @@ func removeTask(reader *bufio.Reader, verification Verification) {
 	protoRemoveTaskRequest := removeTaskRequest.ToProto()
 
 	req, _ := networktools.GenerateRequest(protoRemoveTaskRequest, 17)
-	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
+	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 10240)
 	response, _ := networktools.DeserialiseRequest(data)
 	printError(response, "Successfully removed task")
 }
@@ -169,7 +169,7 @@ func pollTasks(reader *bufio.Reader, verification Verification) {
 	protoPollRequest := pollRequest.ToProto()
 
 	req, _ := networktools.GenerateRequest(protoPollRequest, 15)
-	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 1024)
+	data, _ := networktools.Handle_Single_TCP_Exchange("127.0.0.1:5050", req, 10240)
 	response, _ := networktools.DeserialiseRequest(data)
 
 	if response.Type == 255 {

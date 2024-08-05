@@ -62,6 +62,7 @@ func getTaskAfter(userID uint64, afterTaskID uint64) ([]Task, error) {
 		startKey := (&Uint128{High: userID, Low: afterTaskID}).Uint128ToBytes()
 		for k, v := c.Seek(startKey); k != nil && bytes.HasPrefix(k, prefix); k, v = c.Next() {
 			var task Task
+			fmt.Println(prefix)
 			buf := bytes.NewBuffer(v)
 			if err := gob.NewDecoder(buf).Decode(&task); err != nil {
 				return err

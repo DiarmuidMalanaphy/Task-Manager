@@ -1,22 +1,40 @@
 import 'dart:typed_data';
+import 'package:task_management_system/networking/dartproto/Hash.pb.dart';
+import 'package:task_management_system/networking/dartproto/Username.pb.dart';
+import 'package:task_management_system/networking/dartproto/Username.pbserver.dart';
+import 'package:task_management_system/networking/dartproto/Verification.pb.dart';
 
-class Username {
+class Username_Type {
   static const int LENGTH = 20;
   final Uint8List _bytes;
 
-  Username.fromBytes(this._bytes) {
+  Username_Type.fromBytes(this._bytes) {
     if (bytes.length != LENGTH) {
       throw ArgumentError('Username must be $LENGTH bytes');
     }
   }
 
-  Username.fromString(String username)
+  Username_Type.fromString(String username)
       : _bytes = Uint8List.fromList(padRightWithZeros(username, 20)) {
     if (_bytes.length > LENGTH) {
       throw ArgumentError('Username must be at most $LENGTH characters');
     }
   }
+
+  Username_Type.fromProto(Username proto)
+      : _bytes = Uint8List.fromList(proto.username) {
+    if (_bytes.length != LENGTH) {
+      throw ArgumentError('Username must be $LENGTH bytes');
+    }
+  }
   Uint8List get bytes => _bytes;
+
+  int get length => (_bytes).length;
+  Username get toProto {
+    Username username = Username();
+    username.username = _bytes;
+    return username;
+  }
 
   static List<int> padRightWithZeros(String str, int length) {
     List<int> byteList = List.filled(
@@ -68,15 +86,26 @@ class Password {
   }
 }
 
-class Verification {
-  final Username username;
+class Verification_Type {
+  final Username_Type username;
   final Uint8List hash;
 
   late final Uint8List bytes;
 
-  Verification(this.username, this.hash) {
+  Verification_Type(this.username, this.hash) {
     bytes = Uint8List(username.bytes.length + hash.length);
     bytes.setRange(0, username.bytes.length, username.bytes);
     bytes.setRange(username.bytes.length, bytes.length, hash);
+  }
+  Verification get toProto {
+    Verification verification = Verification();
+    verification.username = username.toProto;
+
+    Hash hashProto = Hash();
+    hashProto.hash = hash;
+
+    verification.hash = hashProto;
+
+    return verification;
   }
 }

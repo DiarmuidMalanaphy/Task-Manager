@@ -1,34 +1,21 @@
 import 'base.dart';
 import 'dart:typed_data';
+import '../dartproto/AddUserRequest.pb.dart';
 
-class AddUserRequest {
-  final Username username;
+class AddUserRequest_Type {
+  final Username_Type username;
   final Password password;
 
-  AddUserRequest(this.username, this.password);
+  AddUserRequest_Type(this.username, this.password);
 
-  AddUserRequest.fromStrings(String username, String password)
-      : username = Username.fromString(username),
+  AddUserRequest_Type.fromStrings(String username, String password)
+      : username = Username_Type.fromString(username),
         password = Password.fromString(password);
-}
 
-Uint8List serializeAddUserRequest(AddUserRequest request) {
-  var buffer = ByteData(Username.LENGTH + Password.LENGTH);
-  buffer.buffer
-      .asUint8List(0, Username.LENGTH)
-      .setAll(0, request.username.bytes);
-  buffer.buffer
-      .asUint8List(Username.LENGTH, Password.LENGTH)
-      .setAll(0, request.password.bytes);
-  return buffer.buffer.asUint8List();
-}
-
-AddUserRequest? deserializeAddUserRequest(Uint8List? payload) {
-  if (payload != null && payload.length == Username.LENGTH + Password.LENGTH) {
-    var username = Username.fromBytes(payload.sublist(0, Username.LENGTH));
-    var password = Password.fromBytes(
-        payload.sublist(Username.LENGTH, Username.LENGTH + Password.LENGTH));
-    return AddUserRequest(username, password);
+  Uint8List get serialise {
+    final addUserRequest = AddUserRequest()
+      ..username = username.toProto
+      ..password = password.bytes;
+    return addUserRequest.writeToBuffer();
   }
-  return null;
 }

@@ -107,6 +107,28 @@ func RemoveUserRequest_FromProto(data []byte) (RemoveUserRequest, error) {
 	}, nil
 }
 
+type LoginRequest struct {
+	Verification Verification
+}
+
+func (r LoginRequest) ToProto() *pb.LoginRequest {
+	return &pb.LoginRequest{
+		Verification: r.Verification.ToProto(),
+	}
+}
+
+func LoginRequest_FromProto(data []byte) (LoginRequest, error) {
+	var protobuf_request pb.RemoveUserRequest
+	err := proto.Unmarshal(data, &protobuf_request)
+
+	if err != nil {
+		return LoginRequest{}, err
+	}
+	return LoginRequest{
+		Verification: Verification_FromProto(protobuf_request.Verification),
+	}, nil
+}
+
 type VerifyUserExistsRequest struct {
 	Username Username
 }
