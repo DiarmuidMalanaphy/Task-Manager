@@ -12,10 +12,9 @@ set(FLUTTER_VERSION_BUILD 1 PARENT_SCOPE)
 list(APPEND FLUTTER_TOOL_ENVIRONMENT
   "FLUTTER_ROOT=/home/diarmuid/snap/flutter/common/flutter"
   "PROJECT_DIR=/home/diarmuid/Documents/task_manager/client/task_management_system"
-  "DART_DEFINES=RkxVVFRFUl9XRUJfQ0FOVkFTS0lUX1VSTD1odHRwczovL3d3dy5nc3RhdGljLmNvbS9mbHV0dGVyLWNhbnZhc2tpdC8yMzVkYjkxMWJhMjc5NzIyZjVlNjg1ZjM4YjBlZDMwZmE3ZTg1NzBhLw=="
   "DART_OBFUSCATION=false"
   "TRACK_WIDGET_CREATION=true"
-  "TREE_SHAKE_ICONS=false"
+  "TREE_SHAKE_ICONS=true"
   "PACKAGE_CONFIG=/home/diarmuid/Documents/task_manager/client/task_management_system/.dart_tool/package_config.json"
-  "FLUTTER_TARGET=/home/diarmuid/Documents/task_manager/client/task_management_system/lib/main.dart"
+  "FLUTTER_TARGET=lib/main.dart"
 )
