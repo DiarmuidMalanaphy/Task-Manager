@@ -5,6 +5,6 @@ import "Verification.proto";
 option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 
 message LoginRequest {
-	Verification verification = 1;
+	InitialVerification initialverification = 1;
 }
 

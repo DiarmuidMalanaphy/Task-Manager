@@ -13,17 +13,33 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
-@$core.Deprecated('Use verificationDescriptor instead')
-const Verification$json = {
-  '1': 'Verification',
+@$core.Deprecated('Use initialVerificationDescriptor instead')
+const InitialVerification$json = {
+  '1': 'InitialVerification',
   '2': [
     {'1': 'Username', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.Username', '10': 'Username'},
     {'1': 'Hash', '3': 2, '4': 1, '5': 11, '6': '.taskmanager.pb.Hash', '10': 'Hash'},
   ],
 };
 
-/// Descriptor for `Verification`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List verificationDescriptor = $convert.base64Decode(
-    'CgxWZXJpZmljYXRpb24SNAoIVXNlcm5hbWUYASABKAsyGC50YXNrbWFuYWdlci5wYi5Vc2Vybm'
-    'FtZVIIVXNlcm5hbWUSKAoESGFzaBgCIAEoCzIULnRhc2ttYW5hZ2VyLnBiLkhhc2hSBEhhc2g=');
+/// Descriptor for `InitialVerification`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List initialVerificationDescriptor = $convert.base64Decode(
+    'ChNJbml0aWFsVmVyaWZpY2F0aW9uEjQKCFVzZXJuYW1lGAEgASgLMhgudGFza21hbmFnZXIucG'
+    'IuVXNlcm5hbWVSCFVzZXJuYW1lEigKBEhhc2gYAiABKAsyFC50YXNrbWFuYWdlci5wYi5IYXNo'
+    'UgRIYXNo');
+
+@$core.Deprecated('Use verificationTokenDescriptor instead')
+const VerificationToken$json = {
+  '1': 'VerificationToken',
+  '2': [
+    {'1': 'token', '3': 1, '4': 1, '5': 12, '10': 'token'},
+    {'1': 'userID', '3': 2, '4': 1, '5': 4, '10': 'userID'},
+    {'1': 'expires', '3': 3, '4': 1, '5': 4, '10': 'expires'},
+  ],
+};
+
+/// Descriptor for `VerificationToken`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List verificationTokenDescriptor = $convert.base64Decode(
+    'ChFWZXJpZmljYXRpb25Ub2tlbhIUCgV0b2tlbhgBIAEoDFIFdG9rZW4SFgoGdXNlcklEGAIgAS'
+    'gEUgZ1c2VySUQSGAoHZXhwaXJlcxgDIAEoBFIHZXhwaXJlcw==');
 

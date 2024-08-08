@@ -17,13 +17,13 @@ import 'dart:typed_data' as $typed_data;
 const RemoveTaskRequest$json = {
   '1': 'RemoveTaskRequest',
   '2': [
-    {'1': 'verification', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.Verification', '10': 'verification'},
+    {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.VerificationToken', '10': 'token'},
     {'1': 'TaskID', '3': 2, '4': 1, '5': 4, '10': 'TaskID'},
   ],
 };
 
 /// Descriptor for `RemoveTaskRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List removeTaskRequestDescriptor = $convert.base64Decode(
-    'ChFSZW1vdmVUYXNrUmVxdWVzdBJACgx2ZXJpZmljYXRpb24YASABKAsyHC50YXNrbWFuYWdlci'
-    '5wYi5WZXJpZmljYXRpb25SDHZlcmlmaWNhdGlvbhIWCgZUYXNrSUQYAiABKARSBlRhc2tJRA==');
+    'ChFSZW1vdmVUYXNrUmVxdWVzdBI3CgV0b2tlbhgBIAEoCzIhLnRhc2ttYW5hZ2VyLnBiLlZlcm'
+    'lmaWNhdGlvblRva2VuUgV0b2tlbhIWCgZUYXNrSUQYAiABKARSBlRhc2tJRA==');
 

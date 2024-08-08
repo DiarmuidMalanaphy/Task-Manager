@@ -11,18 +11,19 @@
 
 import 'dart:core' as $core;
 
+import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'Verification.pb.dart' as $2;
 
 class PollUserRequest extends $pb.GeneratedMessage {
   factory PollUserRequest({
-    $2.Verification? verification,
-    $core.int? lastseentaskID,
+    $2.VerificationToken? token,
+    $fixnum.Int64? lastseentaskID,
   }) {
     final $result = create();
-    if (verification != null) {
-      $result.verification = verification;
+    if (token != null) {
+      $result.token = token;
     }
     if (lastseentaskID != null) {
       $result.lastseentaskID = lastseentaskID;
@@ -34,8 +35,8 @@ class PollUserRequest extends $pb.GeneratedMessage {
   factory PollUserRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'PollUserRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'taskmanager.pb'), createEmptyInstance: create)
-    ..aOM<$2.Verification>(1, _omitFieldNames ? '' : 'verification', subBuilder: $2.Verification.create)
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'lastseentaskID', $pb.PbFieldType.OU3, protoName: 'lastseentaskID')
+    ..aOM<$2.VerificationToken>(1, _omitFieldNames ? '' : 'token', subBuilder: $2.VerificationToken.create)
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'lastseentaskID', $pb.PbFieldType.OU6, protoName: 'lastseentaskID', defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false
   ;
 
@@ -61,20 +62,20 @@ class PollUserRequest extends $pb.GeneratedMessage {
   static PollUserRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $2.Verification get verification => $_getN(0);
+  $2.VerificationToken get token => $_getN(0);
   @$pb.TagNumber(1)
-  set verification($2.Verification v) { setField(1, v); }
+  set token($2.VerificationToken v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasVerification() => $_has(0);
+  $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearVerification() => clearField(1);
+  void clearToken() => clearField(1);
   @$pb.TagNumber(1)
-  $2.Verification ensureVerification() => $_ensure(0);
+  $2.VerificationToken ensureToken() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.int get lastseentaskID => $_getIZ(1);
+  $fixnum.Int64 get lastseentaskID => $_getI64(1);
   @$pb.TagNumber(2)
-  set lastseentaskID($core.int v) { $_setUnsignedInt32(1, v); }
+  set lastseentaskID($fixnum.Int64 v) { $_setInt64(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasLastseentaskID() => $_has(1);
   @$pb.TagNumber(2)

@@ -1,30 +1,18 @@
 package main
 
 import (
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 	"sync"
 )
 
 type User struct {
 	Username    Username
 	UserID      uint64
-	Hash        Hash
+	Hash        StoredHash
 	TaskCounter uint64
 	mutex       sync.Mutex
 }
 
-func NewUser_FromProtobuf(username *pb.Username, hash *pb.Hash) User {
-	usernameByte := Username_FromProto(username)
-	hashByte := Hash_FromProto(hash)
-	return User{
-		Username:    usernameByte,
-		Hash:        hashByte,
-		UserID:      0,
-		TaskCounter: 0,
-	}
-}
-
-func NewUser_FromGo(name [20]byte, hash Hash) User {
+func NewUser_FromGo(name [20]byte, hash StoredHash) User {
 	return User{
 		Username:    name,
 		UserID:      0,

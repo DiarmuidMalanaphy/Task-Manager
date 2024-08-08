@@ -17,14 +17,14 @@ import 'dart:typed_data' as $typed_data;
 const PollUserRequest$json = {
   '1': 'PollUserRequest',
   '2': [
-    {'1': 'verification', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.Verification', '10': 'verification'},
-    {'1': 'lastseentaskID', '3': 2, '4': 1, '5': 13, '10': 'lastseentaskID'},
+    {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.VerificationToken', '10': 'token'},
+    {'1': 'lastseentaskID', '3': 2, '4': 1, '5': 4, '10': 'lastseentaskID'},
   ],
 };
 
 /// Descriptor for `PollUserRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List pollUserRequestDescriptor = $convert.base64Decode(
-    'Cg9Qb2xsVXNlclJlcXVlc3QSQAoMdmVyaWZpY2F0aW9uGAEgASgLMhwudGFza21hbmFnZXIucG'
-    'IuVmVyaWZpY2F0aW9uUgx2ZXJpZmljYXRpb24SJgoObGFzdHNlZW50YXNrSUQYAiABKA1SDmxh'
-    'c3RzZWVudGFza0lE');
+    'Cg9Qb2xsVXNlclJlcXVlc3QSNwoFdG9rZW4YASABKAsyIS50YXNrbWFuYWdlci5wYi5WZXJpZm'
+    'ljYXRpb25Ub2tlblIFdG9rZW4SJgoObGFzdHNlZW50YXNrSUQYAiABKARSDmxhc3RzZWVudGFz'
+    'a0lE');
 

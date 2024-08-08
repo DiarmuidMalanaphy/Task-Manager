@@ -17,11 +17,11 @@ import 'Verification.pb.dart' as $2;
 
 class RemoveUserRequest extends $pb.GeneratedMessage {
   factory RemoveUserRequest({
-    $2.Verification? verification,
+    $2.VerificationToken? token,
   }) {
     final $result = create();
-    if (verification != null) {
-      $result.verification = verification;
+    if (token != null) {
+      $result.token = token;
     }
     return $result;
   }
@@ -30,7 +30,7 @@ class RemoveUserRequest extends $pb.GeneratedMessage {
   factory RemoveUserRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RemoveUserRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'taskmanager.pb'), createEmptyInstance: create)
-    ..aOM<$2.Verification>(1, _omitFieldNames ? '' : 'verification', subBuilder: $2.Verification.create)
+    ..aOM<$2.VerificationToken>(1, _omitFieldNames ? '' : 'token', subBuilder: $2.VerificationToken.create)
     ..hasRequiredFields = false
   ;
 
@@ -56,15 +56,15 @@ class RemoveUserRequest extends $pb.GeneratedMessage {
   static RemoveUserRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $2.Verification get verification => $_getN(0);
+  $2.VerificationToken get token => $_getN(0);
   @$pb.TagNumber(1)
-  set verification($2.Verification v) { setField(1, v); }
+  set token($2.VerificationToken v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasVerification() => $_has(0);
+  $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearVerification() => clearField(1);
+  void clearToken() => clearField(1);
   @$pb.TagNumber(1)
-  $2.Verification ensureVerification() => $_ensure(0);
+  $2.VerificationToken ensureToken() => $_ensure(0);
 }
 
 

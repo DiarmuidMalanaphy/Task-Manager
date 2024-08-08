@@ -17,11 +17,11 @@ import 'Verification.pb.dart' as $2;
 
 class LoginRequest extends $pb.GeneratedMessage {
   factory LoginRequest({
-    $2.Verification? verification,
+    $2.InitialVerification? initialverification,
   }) {
     final $result = create();
-    if (verification != null) {
-      $result.verification = verification;
+    if (initialverification != null) {
+      $result.initialverification = initialverification;
     }
     return $result;
   }
@@ -30,7 +30,7 @@ class LoginRequest extends $pb.GeneratedMessage {
   factory LoginRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LoginRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'taskmanager.pb'), createEmptyInstance: create)
-    ..aOM<$2.Verification>(1, _omitFieldNames ? '' : 'verification', subBuilder: $2.Verification.create)
+    ..aOM<$2.InitialVerification>(1, _omitFieldNames ? '' : 'initialverification', subBuilder: $2.InitialVerification.create)
     ..hasRequiredFields = false
   ;
 
@@ -56,15 +56,15 @@ class LoginRequest extends $pb.GeneratedMessage {
   static LoginRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $2.Verification get verification => $_getN(0);
+  $2.InitialVerification get initialverification => $_getN(0);
   @$pb.TagNumber(1)
-  set verification($2.Verification v) { setField(1, v); }
+  set initialverification($2.InitialVerification v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasVerification() => $_has(0);
+  $core.bool hasInitialverification() => $_has(0);
   @$pb.TagNumber(1)
-  void clearVerification() => clearField(1);
+  void clearInitialverification() => clearField(1);
   @$pb.TagNumber(1)
-  $2.Verification ensureVerification() => $_ensure(0);
+  $2.InitialVerification ensureInitialverification() => $_ensure(0);
 }
 
 

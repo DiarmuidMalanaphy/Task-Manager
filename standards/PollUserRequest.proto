@@ -5,7 +5,7 @@ import "Verification.proto";
 option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 
 message PollUserRequest{
-	Verification verification = 1;
-	uint32 lastseentaskID = 2;
+	VerificationToken token = 1;
+	uint64 lastseentaskID = 2;
 }
 

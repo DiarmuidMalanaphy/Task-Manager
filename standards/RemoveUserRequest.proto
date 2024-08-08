@@ -7,6 +7,6 @@ option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 import "Verification.proto";
 
 message RemoveUserRequest {
-	Verification verification = 1;
+	VerificationToken token = 1;
 }
 

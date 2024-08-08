@@ -3,7 +3,6 @@ import 'package:task_management_system/apps/splash_page.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import 'package:task_management_system/networking/standards/Task.dart';
 import 'package:task_management_system/apps/add_task_page.dart';
-import '../main.dart';
 import 'task_filters.dart';
 import 'task_tile.dart';
 
@@ -344,7 +343,7 @@ class _TaskListPageState extends State<TaskListPage> {
   }
 
   void _logout() {
-    widget.tms.resetVerification();
+    widget.tms.clearVerification();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => SplashPage()),
       (Route<dynamic> route) => false,

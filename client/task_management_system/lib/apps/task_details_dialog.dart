@@ -7,8 +7,8 @@ import 'dart:typed_data';
 void showTaskDetails(
     BuildContext context, Task_Type task, TaskManagementSystem tms) {
   final statusMap = {0: 'Pending', 1: 'Completed'};
-  final isOwnTask =
-      task.setterUsername.toString() == tms.verification.username.toString();
+
+  final isOwnTask = task.setterUsername.toString() == tms.username!.toString();
 
   showDialog(
     context: context,

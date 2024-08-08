@@ -1,4 +1,4 @@
-import 'base.dart';
+import 'username.dart';
 import 'dart:typed_data';
 import '../dartproto/VerifyUserExistsRequest.pb.dart';
 

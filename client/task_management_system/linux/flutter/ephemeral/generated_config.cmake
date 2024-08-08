@@ -14,7 +14,7 @@ list(APPEND FLUTTER_TOOL_ENVIRONMENT
   "PROJECT_DIR=/home/diarmuid/Documents/task_manager/client/task_management_system"
   "DART_OBFUSCATION=false"
   "TRACK_WIDGET_CREATION=true"
-  "TREE_SHAKE_ICONS=true"
+  "TREE_SHAKE_ICONS=false"
   "PACKAGE_CONFIG=/home/diarmuid/Documents/task_manager/client/task_management_system/.dart_tool/package_config.json"
-  "FLUTTER_TARGET=lib/main.dart"
+  "FLUTTER_TARGET=/home/diarmuid/Documents/task_manager/client/task_management_system/lib/main.dart"
 )

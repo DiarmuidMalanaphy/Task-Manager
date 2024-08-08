@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_system/networking/standards/base.dart';
-import 'package:task_management_system/networking/standards/utility.dart';
+import 'package:task_management_system/networking/auth.dart';
+import 'package:task_management_system/networking/standards/username.dart';
+import 'package:task_management_system/networking/standards/hash.dart';
+import 'package:task_management_system/networking/standards/password.dart';
+import 'package:task_management_system/networking/standards/verification.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import 'package:task_management_system/apps/task_list_page.dart';
 
@@ -11,7 +14,7 @@ class LoginPage extends StatelessWidget {
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final tms = TaskManagementSystem();
+  final tms = TaskManagementSystem(Auth());
 
   @override
   Widget build(BuildContext context) {
@@ -89,13 +92,16 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<void> _login(BuildContext context) async {
-    bool success = await tms.loginUser(
-      Verification_Type(
-        Username_Type.fromString(_usernameController.text),
-        createHash(_passwordController.text),
-      ),
+    Initialisation_Verification_Type verification =
+        Initialisation_Verification_Type(
+      Username_Type.fromString(_usernameController.text),
+      Hash_Type(Password.fromString(_passwordController.text)),
+    );
+    bool success = await tms.getAuthToken(
+      verification,
     );
     if (success) {
+      tms.setVerification(verification);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TaskListPage(tms)),

@@ -17,12 +17,12 @@ import 'dart:typed_data' as $typed_data;
 const RemoveUserRequest$json = {
   '1': 'RemoveUserRequest',
   '2': [
-    {'1': 'verification', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.Verification', '10': 'verification'},
+    {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.VerificationToken', '10': 'token'},
   ],
 };
 
 /// Descriptor for `RemoveUserRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List removeUserRequestDescriptor = $convert.base64Decode(
-    'ChFSZW1vdmVVc2VyUmVxdWVzdBJACgx2ZXJpZmljYXRpb24YASABKAsyHC50YXNrbWFuYWdlci'
-    '5wYi5WZXJpZmljYXRpb25SDHZlcmlmaWNhdGlvbg==');
+    'ChFSZW1vdmVVc2VyUmVxdWVzdBI3CgV0b2tlbhgBIAEoCzIhLnRhc2ttYW5hZ2VyLnBiLlZlcm'
+    'lmaWNhdGlvblRva2VuUgV0b2tlbg==');
 

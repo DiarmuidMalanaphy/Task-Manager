@@ -1,21 +1,23 @@
-import 'base.dart';
+import 'package:task_management_system/networking/standards/verification.dart';
+
+import 'username.dart';
+import 'password.dart';
 import 'dart:typed_data';
+import 'hash.dart';
 import '../dartproto/AddUserRequest.pb.dart';
 
 class AddUserRequest_Type {
-  final Username_Type username;
-  final Password password;
+  final Initialisation_Verification_Type verification;
 
-  AddUserRequest_Type(this.username, this.password);
-
-  AddUserRequest_Type.fromStrings(String username, String password)
-      : username = Username_Type.fromString(username),
-        password = Password.fromString(password);
+  AddUserRequest_Type(String username, String password)
+      : verification = Initialisation_Verification_Type(
+            Username_Type.fromString(username),
+            Hash_Type(Password.fromString(password)));
 
   Uint8List get serialise {
     final addUserRequest = AddUserRequest()
-      ..username = username.toProto
-      ..password = password.bytes;
+      ..verification = verification.toProto;
+
     return addUserRequest.writeToBuffer();
   }
 }

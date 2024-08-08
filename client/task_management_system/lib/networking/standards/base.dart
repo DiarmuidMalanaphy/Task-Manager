@@ -1,8 +1,6 @@
 import 'dart:typed_data';
-import 'package:task_management_system/networking/dartproto/Hash.pb.dart';
 import 'package:task_management_system/networking/dartproto/Username.pb.dart';
 import 'package:task_management_system/networking/dartproto/Username.pbserver.dart';
-import 'package:task_management_system/networking/dartproto/Verification.pb.dart';
 
 class Username_Type {
   static const int LENGTH = 20;
@@ -54,58 +52,5 @@ class Username_Type {
 
     // Convert the trimmed bytes to a string
     return String.fromCharCodes(_bytes.sublist(0, endIndex));
-  }
-}
-
-class Password {
-  static const int LENGTH = 30;
-  final Uint8List _bytes;
-
-  Password.fromBytes(this._bytes) {
-    if (_bytes.length != LENGTH) {
-      throw ArgumentError('Password must be $LENGTH bytes');
-    }
-  }
-
-  Password.fromString(String password)
-      : _bytes = Uint8List.fromList(padRightWithZeros(password, LENGTH)) {
-    if (_bytes.length > LENGTH) {
-      throw ArgumentError('Password must be at most $LENGTH characters');
-    }
-  }
-
-  Uint8List get bytes => _bytes;
-
-  static List<int> padRightWithZeros(String str, int length) {
-    List<int> byteList = List.filled(length, 0);
-    List<int> strBytes = str.codeUnits;
-    for (int i = 0; i < strBytes.length && i < length; i++) {
-      byteList[i] = strBytes[i];
-    }
-    return byteList;
-  }
-}
-
-class Verification_Type {
-  final Username_Type username;
-  final Uint8List hash;
-
-  late final Uint8List bytes;
-
-  Verification_Type(this.username, this.hash) {
-    bytes = Uint8List(username.bytes.length + hash.length);
-    bytes.setRange(0, username.bytes.length, username.bytes);
-    bytes.setRange(username.bytes.length, bytes.length, hash);
-  }
-  Verification get toProto {
-    Verification verification = Verification();
-    verification.username = username.toProto;
-
-    Hash hashProto = Hash();
-    hashProto.hash = hash;
-
-    verification.hash = hashProto;
-
-    return verification;
   }
 }

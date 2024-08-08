@@ -5,7 +5,7 @@ package taskmanager.pb;
 option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 import "Verification.proto";
 message RemoveTaskRequest {
-	Verification verification = 1;
+	VerificationToken token = 1;
 	uint64 TaskID = 2;
 }
 

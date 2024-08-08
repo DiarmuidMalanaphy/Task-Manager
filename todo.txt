@@ -1,17 +1,11 @@
 Necessary
 	Add Date added
 	Add Pictures
-	Store login details so user doesn't continually have to login
-	Make register inherently login user
 	Revamp taskDesc
-	Make more advanced searching (searching by user)
 	Make it default to diarmuidmalanaphy.co.uk
-	make it put the completed tasks in the settings area.
 	trim the Description (remove excess bytes)
 +
 	Add unique filters for a user
 	
-	Add JWT
 	Add DarkMode
-	add progress count using status (inprogress make that a filter too)
 

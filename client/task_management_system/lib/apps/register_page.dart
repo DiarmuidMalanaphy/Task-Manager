@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_system/networking/auth.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import 'package:task_management_system/apps/task_list_page.dart';
 
@@ -10,7 +11,7 @@ class RegisterPage extends StatelessWidget {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final tms = TaskManagementSystem();
+  final tms = TaskManagementSystem(Auth());
 
   @override
   Widget build(BuildContext context) {

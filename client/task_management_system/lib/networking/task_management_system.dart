@@ -1,9 +1,11 @@
+import 'package:task_management_system/networking/auth.dart';
 import 'package:task_management_system/networking/standards/Error.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:task_management_system/networking/standards/LoginRequest.dart';
-import 'standards/base.dart';
+import 'standards/username.dart';
 import 'standards/AddUserRequest.dart';
 import 'standards/AddTaskRequest.dart';
+import 'standards/verification.dart';
 import 'standards/VerifyUserExists.dart';
 import 'standards/RemoveTaskRequest.dart';
 import 'standards/PollUserRequest.dart';
@@ -14,7 +16,9 @@ import 'standards/utility.dart';
 import 'networktool.dart';
 
 class TaskManagementSystem {
-  Verification_Type? _verification;
+  final Auth _auth;
+  TaskManagementSystem(this._auth);
+
   final targetIP =
       "192.168.0.66"; // Should add an IP address that is verified to work on the initial login stage or, have it such that it pings the IP address a few times to see if it will reply.
 
@@ -39,12 +43,20 @@ class TaskManagementSystem {
     return false;
   }
 
-  Verification_Type get verification {
-    return _verification!;
+  Initialisation_Verification_Type? get userdata {
+    return _auth.getInitialVerification();
   }
 
-  void resetVerification() {
-    _verification = null;
+  Username_Type? get username {
+    return _auth.getUsername();
+  }
+
+  void clearVerification() {
+    _auth.clear();
+  }
+
+  void setVerification(Initialisation_Verification_Type verification) {
+    _auth.storeInitialVerification(verification);
   }
 
 //NETWORKING FUNCTIONS
@@ -58,8 +70,8 @@ class TaskManagementSystem {
 
   Future<bool> registerUser(String username, String password) async {
     var request = AddUserRequest_Type(
-      Username_Type.fromString(username),
-      Password.fromString(password),
+      username,
+      password,
     );
 
     var req = serialiseRequest(2, request.serialise);
@@ -67,10 +79,10 @@ class TaskManagementSystem {
 
     bool err = logError(reply);
     if (err) {
-      _verification = Verification_Type(
-        Username_Type.fromString(username),
-        createHash(password),
-      );
+      _auth.storeInitialVerification(Initialisation_Verification_Type(
+          request.verification.username, request.verification.hash));
+      _auth.storeVerificationToken(
+          Verification_Token_Type.fromProto(reply.payload));
     }
     return err;
   }
@@ -88,20 +100,21 @@ class TaskManagementSystem {
     return logError(reply);
   }
 
-  Future<bool> loginUser(Verification_Type veri) async {
+  Future<bool> getAuthToken(Initialisation_Verification_Type veri) async {
     LoginRequest_Type request = LoginRequest_Type(veri);
-
     var req = serialiseRequest(6, request.serialise);
     Request_Type reply = await handleSingleTCPExchange(req, targetIP, 5050);
     bool err = logError(reply);
     if (err) {
-      _verification = veri;
+      _auth.storeVerificationToken(
+          Verification_Token_Type.fromProto(reply.payload));
     }
     return err;
   }
 
   Future<List<Task_Type>> pollTasks(int lastSeenID) async {
-    var pollRequest = PollUserRequest_Type(verification, lastSeenID);
+    var token = await _auth.getVerificationToken();
+    var pollRequest = PollUserRequest_Type(token!, Int64(lastSeenID));
 
     var req = serialiseRequest(15, pollRequest.serialise);
 
@@ -116,27 +129,30 @@ class TaskManagementSystem {
     }
   }
 
-  Future<bool> addTask(String taskName, String taskDesc, String targetUsername,
-      int filterone, int filtertwo) async {
+  Future<bool> addTask(String taskName, String taskDesc, String setterUsername,
+      String targetUsername, int filterone, int filtertwo) async {
     var task = Task_Type(
       Int64(0),
       Username_Type.fromString(taskName),
       Username_Type.fromString(targetUsername),
-      verification.username,
+      Username_Type.fromString(setterUsername),
       0,
       stringTo120ByteArray(taskDesc),
       Int64(filterone),
       Int64(0),
     );
 
-    var addTaskRequest = AddTaskRequest_Type(verification, task);
+    print("Personal Username ${setterUsername.toString()}");
+    var token = await _auth.getVerificationToken();
+    var addTaskRequest = AddTaskRequest_Type(token!, task);
     var req = serialiseRequest(16, addTaskRequest.serialise);
     var reply = await handleSingleTCPExchange(req, targetIP, 5050);
     return logError(reply);
   }
 
   Future<bool> removeTask(int taskID) async {
-    var removeTaskRequest = RemoveTaskRequest_Type(verification, taskID);
+    var token = await _auth.getVerificationToken();
+    var removeTaskRequest = RemoveTaskRequest_Type(token!, taskID);
 
     var req = serialiseRequest(17, removeTaskRequest.serialise);
     var reply = await handleSingleTCPExchange(req, targetIP, 5050);
@@ -145,7 +161,8 @@ class TaskManagementSystem {
   }
 
   Future<bool> flipTaskStatus(int taskID) async {
-    var removeTaskRequest = RemoveTaskRequest_Type(verification, taskID);
+    var token = await _auth.getVerificationToken();
+    var removeTaskRequest = RemoveTaskRequest_Type(token!, taskID);
     var req = serialiseRequest(20, removeTaskRequest.serialise);
     var reply = await handleSingleTCPExchange(req, targetIP, 5050);
 

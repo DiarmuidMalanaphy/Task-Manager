@@ -17,14 +17,14 @@ import 'dart:typed_data' as $typed_data;
 const AddTaskRequest$json = {
   '1': 'AddTaskRequest',
   '2': [
-    {'1': 'verification', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.Verification', '10': 'verification'},
+    {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.VerificationToken', '10': 'token'},
     {'1': 'newtask', '3': 2, '4': 1, '5': 11, '6': '.taskmanager.pb.Task', '10': 'newtask'},
   ],
 };
 
 /// Descriptor for `AddTaskRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List addTaskRequestDescriptor = $convert.base64Decode(
-    'Cg5BZGRUYXNrUmVxdWVzdBJACgx2ZXJpZmljYXRpb24YASABKAsyHC50YXNrbWFuYWdlci5wYi'
-    '5WZXJpZmljYXRpb25SDHZlcmlmaWNhdGlvbhIuCgduZXd0YXNrGAIgASgLMhQudGFza21hbmFn'
-    'ZXIucGIuVGFza1IHbmV3dGFzaw==');
+    'Cg5BZGRUYXNrUmVxdWVzdBI3CgV0b2tlbhgBIAEoCzIhLnRhc2ttYW5hZ2VyLnBiLlZlcmlmaW'
+    'NhdGlvblRva2VuUgV0b2tlbhIuCgduZXd0YXNrGAIgASgLMhQudGFza21hbmFnZXIucGIuVGFz'
+    'a1IHbmV3dGFzaw==');
 

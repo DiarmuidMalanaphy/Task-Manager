@@ -6,7 +6,7 @@ import "Task.proto";
 option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 
 message AddTaskRequest {
-	Verification verification = 1;
+	VerificationToken token = 1;
 	Task newtask = 2;
 }
 

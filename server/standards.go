@@ -11,25 +11,6 @@ func init() {
 	gob.Register(Username{})
 }
 
-type Verification struct {
-	Username Username
-	Hash     Hash
-}
-
-func Verification_FromProto(verification *pb.Verification) Verification {
-	return Verification{
-		Username: Username_FromProto(verification.Username),
-		Hash:     Hash_FromProto(verification.Hash),
-	}
-}
-
-func (r Verification) ToProto() *pb.Verification {
-	return &pb.Verification{
-		Username: r.Username.ToProto(),
-		Hash:     r.Hash.ToProto(),
-	}
-}
-
 type Error struct {
 	ErrorMessage [60]byte
 }
@@ -61,14 +42,7 @@ func NewError(message string) *Error {
 
 type AddUserRequest struct {
 	Username Username
-	Password Password
-}
-
-func (r AddUserRequest) ToProto() *pb.AddUserRequest {
-	return &pb.AddUserRequest{
-		Username: r.Username.ToProto(),
-		Password: r.Password.ToProto(),
-	}
+	Hash     NetworkHash
 }
 
 func AddUserRequest_FromProto(data []byte) (AddUserRequest, error) {
@@ -80,20 +54,21 @@ func AddUserRequest_FromProto(data []byte) (AddUserRequest, error) {
 	}
 
 	return AddUserRequest{
-		Username: Username_FromProto(protobuf_request.Username),
-		Password: Password_FromProto(protobuf_request.Password),
+		Username: Username_FromProto(protobuf_request.Verification.Username),
+		Hash:     NetworkHash_FromProto(protobuf_request.Verification.Hash),
 	}, nil
 }
 
 type RemoveUserRequest struct {
-	Verification Verification
+	VerificationToken VerificationToken
 }
 
-func (r RemoveUserRequest) ToProto() *pb.RemoveUserRequest {
-	return &pb.RemoveUserRequest{
-		Verification: r.Verification.ToProto(),
-	}
-}
+//func (r RemoveUserRequest) ToProto() *pb.RemoveUserRequest {
+//	return &pb.RemoveUserRequest{
+//		Token: r.VerificationToken.toPro,
+
+//	}
+//}
 
 func RemoveUserRequest_FromProto(data []byte) (RemoveUserRequest, error) {
 	var protobuf_request pb.RemoveUserRequest
@@ -102,30 +77,35 @@ func RemoveUserRequest_FromProto(data []byte) (RemoveUserRequest, error) {
 	if err != nil {
 		return RemoveUserRequest{}, err
 	}
+	token, err := VerificationToken_FromProto(protobuf_request.Token)
+
+	if err != nil {
+		return RemoveUserRequest{}, err
+	}
 	return RemoveUserRequest{
-		Verification: Verification_FromProto(protobuf_request.Verification),
+		VerificationToken: token,
 	}, nil
 }
 
 type LoginRequest struct {
-	Verification Verification
+	Verification InitialVerification
 }
 
-func (r LoginRequest) ToProto() *pb.LoginRequest {
-	return &pb.LoginRequest{
-		Verification: r.Verification.ToProto(),
-	}
-}
+//func (r LoginRequest) ToProto() *pb.LoginRequest {
+//	return &pb.LoginRequest{
+//		Verification: r.Verification.ToProto(),
+//	}
+//}
 
 func LoginRequest_FromProto(data []byte) (LoginRequest, error) {
-	var protobuf_request pb.RemoveUserRequest
+	var protobuf_request pb.LoginRequest
 	err := proto.Unmarshal(data, &protobuf_request)
 
 	if err != nil {
 		return LoginRequest{}, err
 	}
 	return LoginRequest{
-		Verification: Verification_FromProto(protobuf_request.Verification),
+		Verification: InitialVerification_FromProto(protobuf_request.Initialverification),
 	}, nil
 }
 
@@ -153,14 +133,9 @@ func (r VerifyUserExistsRequest) ToProto() *pb.VerifyUserExistsRequest {
 
 }
 
-type UpdateUserRequest struct {
-	Verification Verification
-	User         User
-} // I am not handling this right now
-
 type PollUserRequest struct {
-	Verification   Verification
-	LastSeenTaskID uint32
+	Verification   VerificationToken
+	LastSeenTaskID uint64
 }
 
 func PollUserRequest_FromProto(data []byte) (PollUserRequest, error) {
@@ -169,22 +144,26 @@ func PollUserRequest_FromProto(data []byte) (PollUserRequest, error) {
 	if err != nil {
 		return PollUserRequest{}, err
 	}
+	token, err := VerificationToken_FromProto(protobuf_request.Token)
+	if err != nil {
+		return PollUserRequest{}, err
+	}
 
 	return PollUserRequest{
-		Verification:   Verification_FromProto(protobuf_request.Verification),
-		LastSeenTaskID: protobuf_request.LastseentaskID,
+		Verification:   token,
+		LastSeenTaskID: uint64(protobuf_request.LastseentaskID),
 	}, nil
 }
 
-func (r PollUserRequest) ToProto() *pb.PollUserRequest {
-	return &pb.PollUserRequest{
-		Verification:   r.Verification.ToProto(),
-		LastseentaskID: r.LastSeenTaskID,
-	}
-}
+//func (r PollUserRequest) ToProto() *pb.PollUserRequest {
+//	return &pb.PollUserRequest{
+//		Verification:   r.Verification.ToProto(),
+//		LastseentaskID: r.LastSeenTaskID,
+//	}
+//}
 
 type AddTaskRequest struct {
-	Verification Verification
+	Verification VerificationToken
 	NewTask      Task
 }
 
@@ -194,22 +173,26 @@ func AddTaskRequest_FromProto(data []byte) (AddTaskRequest, error) {
 	if err != nil {
 		return AddTaskRequest{}, err
 	}
+	token, err := VerificationToken_FromProto(protobuf_request.Token)
+	if err != nil {
+		return AddTaskRequest{}, err
+	}
 
 	return AddTaskRequest{
-		Verification: Verification_FromProto(protobuf_request.Verification),
+		Verification: token,
 		NewTask:      Task_FromProto(protobuf_request.Newtask),
 	}, nil
 }
 
-func (r AddTaskRequest) ToProto() *pb.AddTaskRequest {
-	return &pb.AddTaskRequest{
-		Verification: r.Verification.ToProto(),
-		Newtask:      r.NewTask.ToProto(),
-	}
-}
+//func (r AddTaskRequest) ToProto() *pb.AddTaskRequest {
+//	return &pb.AddTaskRequest{
+//		Verification: r.Verification.ToProto(),
+//		Newtask:      r.NewTask.ToProto(),
+//	}
+//}
 
 type RemoveTaskRequest struct {
-	Verification Verification
+	Verification VerificationToken
 	TaskID       uint64
 }
 
@@ -220,21 +203,26 @@ func RemoveTaskRequest_FromProto(data []byte) (RemoveTaskRequest, error) {
 		return RemoveTaskRequest{}, err
 	}
 
+	token, err := VerificationToken_FromProto(protobuf_request.Token)
+	if err != nil {
+		return RemoveTaskRequest{}, err
+	}
+
 	return RemoveTaskRequest{
-		Verification: Verification_FromProto(protobuf_request.Verification),
+		Verification: token,
 		TaskID:       protobuf_request.TaskID,
 	}, nil
 }
 
-func (r RemoveTaskRequest) ToProto() *pb.RemoveTaskRequest {
-	return &pb.RemoveTaskRequest{
-		Verification: r.Verification.ToProto(),
-		TaskID:       r.TaskID,
-	}
-}
+//func (r RemoveTaskRequest) ToProto() *pb.RemoveTaskRequest {
+//	return &pb.RemoveTaskRequest{
+//		Verification: r.Verification.ToProto(),
+//		TaskID:       r.TaskID,
+//	}
+//}
 
 type RemoveAllTasksRequest struct {
-	Verification Verification
+	Verification VerificationToken
 }
 
 func RemoveAllTasksRequest_FromProto(data []byte) (RemoveAllTasksRequest, error) {
@@ -243,8 +231,14 @@ func RemoveAllTasksRequest_FromProto(data []byte) (RemoveAllTasksRequest, error)
 	if err != nil {
 		return RemoveAllTasksRequest{}, err
 	}
+
+	token, err := VerificationToken_FromProto(protobuf_request.Token)
+	if err != nil {
+		return RemoveAllTasksRequest{}, err
+	}
+
 	return RemoveAllTasksRequest{
-		Verification: Verification_FromProto(protobuf_request.Verification),
+		Verification: token,
 	}, nil
 
 }

@@ -7,6 +7,6 @@ option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
 
 message UpdateUserRequest {
 	Username username = 1;
-	Verification verification = 2;
+	VerificationToken token = 2;
 }
 

@@ -13,19 +13,15 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'Username.pb.dart' as $0;
+import 'Verification.pb.dart' as $2;
 
 class AddUserRequest extends $pb.GeneratedMessage {
   factory AddUserRequest({
-    $0.Username? username,
-    $core.List<$core.int>? password,
+    $2.InitialVerification? verification,
   }) {
     final $result = create();
-    if (username != null) {
-      $result.username = username;
-    }
-    if (password != null) {
-      $result.password = password;
+    if (verification != null) {
+      $result.verification = verification;
     }
     return $result;
   }
@@ -34,8 +30,7 @@ class AddUserRequest extends $pb.GeneratedMessage {
   factory AddUserRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AddUserRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'taskmanager.pb'), createEmptyInstance: create)
-    ..aOM<$0.Username>(1, _omitFieldNames ? '' : 'username', subBuilder: $0.Username.create)
-    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'password', $pb.PbFieldType.OY)
+    ..aOM<$2.InitialVerification>(1, _omitFieldNames ? '' : 'verification', subBuilder: $2.InitialVerification.create)
     ..hasRequiredFields = false
   ;
 
@@ -61,24 +56,15 @@ class AddUserRequest extends $pb.GeneratedMessage {
   static AddUserRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $0.Username get username => $_getN(0);
+  $2.InitialVerification get verification => $_getN(0);
   @$pb.TagNumber(1)
-  set username($0.Username v) { setField(1, v); }
+  set verification($2.InitialVerification v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasUsername() => $_has(0);
+  $core.bool hasVerification() => $_has(0);
   @$pb.TagNumber(1)
-  void clearUsername() => clearField(1);
+  void clearVerification() => clearField(1);
   @$pb.TagNumber(1)
-  $0.Username ensureUsername() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $core.List<$core.int> get password => $_getN(1);
-  @$pb.TagNumber(2)
-  set password($core.List<$core.int> v) { $_setBytes(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasPassword() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearPassword() => clearField(2);
+  $2.InitialVerification ensureVerification() => $_ensure(0);
 }
 
 

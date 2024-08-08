@@ -19,14 +19,14 @@ import 'Verification.pb.dart' as $2;
 class UpdateUserRequest extends $pb.GeneratedMessage {
   factory UpdateUserRequest({
     $0.Username? username,
-    $2.Verification? verification,
+    $2.VerificationToken? token,
   }) {
     final $result = create();
     if (username != null) {
       $result.username = username;
     }
-    if (verification != null) {
-      $result.verification = verification;
+    if (token != null) {
+      $result.token = token;
     }
     return $result;
   }
@@ -36,7 +36,7 @@ class UpdateUserRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'UpdateUserRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'taskmanager.pb'), createEmptyInstance: create)
     ..aOM<$0.Username>(1, _omitFieldNames ? '' : 'username', subBuilder: $0.Username.create)
-    ..aOM<$2.Verification>(2, _omitFieldNames ? '' : 'verification', subBuilder: $2.Verification.create)
+    ..aOM<$2.VerificationToken>(2, _omitFieldNames ? '' : 'token', subBuilder: $2.VerificationToken.create)
     ..hasRequiredFields = false
   ;
 
@@ -73,15 +73,15 @@ class UpdateUserRequest extends $pb.GeneratedMessage {
   $0.Username ensureUsername() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $2.Verification get verification => $_getN(1);
+  $2.VerificationToken get token => $_getN(1);
   @$pb.TagNumber(2)
-  set verification($2.Verification v) { setField(2, v); }
+  set token($2.VerificationToken v) { setField(2, v); }
   @$pb.TagNumber(2)
-  $core.bool hasVerification() => $_has(1);
+  $core.bool hasToken() => $_has(1);
   @$pb.TagNumber(2)
-  void clearVerification() => clearField(2);
+  void clearToken() => clearField(2);
   @$pb.TagNumber(2)
-  $2.Verification ensureVerification() => $_ensure(1);
+  $2.VerificationToken ensureToken() => $_ensure(1);
 }
 
 

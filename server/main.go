@@ -12,7 +12,7 @@ const (
 	RequestTypeRemoveUser       = uint8(3)
 	RequestTypeVerifyUserExists = uint8(4)
 	RequestTypeUpdateUser       = uint8(5)
-	RequestTypeLoginUser        = uint8(6)
+	RequestTypeGenerateToken    = uint8(6)
 
 	RequestTypePollUser       = uint8(15)
 	RequestTypeAddTask        = uint8(16)
@@ -20,6 +20,9 @@ const (
 	RequestTypeRemoveAllTasks = uint8(18)
 	RequestTypeUpdateTask     = uint8(19)
 	RequestTypeFlipTaskState  = uint8(20)
+
+	RequestTypeAddFilter   = uint8(30)
+	RequestTypePollConfigs = uint8(31)
 
 	RequestDefaultSuccessful  = uint8(200)
 	RequestNoReturnSuccessful = uint8(220)
@@ -37,16 +40,6 @@ func main() {
 		case data := <-request_channel: //Could have support for TCP requests in here too.
 			handle_TCP_requests(data, user_map)
 		}
-	}
-}
-
-type empty struct {
-	Type uint8
-}
-
-func get_small_meaningless_data() empty {
-	return empty{
-		Type: 8,
 	}
 }
 
@@ -78,7 +71,9 @@ func get_small_meaningless_data() empty {
 // Return a success or failure
 
 func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
+
 	fmt.Printf("Received Request-Type: %d\n", data.Request.Type)
+
 	switch data.Request.Type {
 	case RequestTypePollAlive:
 		generate_and_send_success(data)
@@ -97,8 +92,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			return
 		}
 
-		stringified_password := r.Password.toString()
-		new_user := NewUser_FromGo(r.Username, createHash(stringified_password))
+		storedHash, err := createStoredHash(r.Hash)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		new_user := NewUser_FromGo(r.Username, storedHash)
 		user_map.Add(&new_user)
 		generate_and_send_success(data)
 		return
@@ -109,17 +108,13 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-		if !does_user_exist(r.Verification.Username, user_map) {
-			generate_and_send_error("Username doesn't exist", data)
-			return
-		}
 
-		if !user_map.Verify(r.Verification) {
+		if !user_map.VerifyToken(r.VerificationToken) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
 
-		user_map.Remove(r.Verification.Username.toString())
+		user_map.Remove(r.VerificationToken.UserID)
 		generate_and_send_success(data)
 		return
 
@@ -147,15 +142,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			return
 		}
 
-		if !does_user_exist(t.Verification.Username, user_map) {
-			generate_and_send_error("Sender username isn't registered", data)
-			return
-		}
-		if !user_map.Verify(t.Verification) {
+		fmt.Println(t.Verification.Token)
+		if !user_map.VerifyToken(t.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
-		user := user_map.Value(t.Verification.Username.toString())
+		user, _ := user_map.Value(t.Verification.UserID)
 		tasks, err := user.GetTasksAfter(uint64(t.LastSeenTaskID))
 		taskList := &pb.TaskList{
 			Tasks: make([]*pb.Task, 0, len(tasks)),
@@ -164,7 +156,6 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			task := tasks[i]
 			pbTask := task.ToProto()
 			taskList.Tasks = append(taskList.Tasks, pbTask)
-			fmt.Println(task.TargetUsername.toString())
 		}
 		var outgoing_req []byte
 		if len(tasks) == 0 {
@@ -178,23 +169,31 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		networktool.SendTCPReply(data.Conn, outgoing_req)
 		return
 
-	case RequestTypeLoginUser:
+	case RequestTypeGenerateToken:
 		fmt.Println("Login")
+
 		r, err := LoginRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		if !does_user_exist(r.Verification.Username, user_map) {
-			generate_and_send_error("Username doesn't exist", data)
-			return
-		}
-
-		if !user_map.Verify(r.Verification) {
+		if !user_map.VerifyUser(r.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
-		generate_and_send_success(data)
+		user, _ := user_map.Value(r.Verification.Username.toString())
+		token, err := NewVerificationToken(user.UserID)
+		user_map.AddToken(token)
+
+		serialisedData := token.ToProto()
+		outgoing_req, err := networktool.GenerateRequest(serialisedData, RequestDefaultSuccessful)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		networktool.SendTCPReply(data.Conn, outgoing_req)
 		return
 
 	case RequestTypeAddTask:
@@ -204,21 +203,23 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-
-		if !does_user_exist(r.Verification.Username, user_map) {
-			generate_and_send_error("Sender username isn't registered", data)
-			return
-		}
-		if !user_map.Verify(r.Verification) {
+		fmt.Println("PiA")
+		fmt.Println(r.NewTask.TargetUsername)
+		if !user_map.VerifyToken(r.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
-
+		fmt.Println("PiB")
 		if !does_user_exist(r.NewTask.TargetUsername, user_map) {
 			generate_and_send_error("Recipient username isn't registered", data)
 			return
 		}
-		target_user := user_map.Value(r.NewTask.TargetUsername.toString())
+
+		fmt.Println("PiC")
+		target_user, ok := user_map.Value(r.NewTask.TargetUsername.toString())
+		if ok == true {
+			fmt.Println("nope")
+		}
 
 		r.NewTask.TaskID = target_user.IncrementTaskID()
 		err = target_user.AddTask(r.NewTask)
@@ -239,20 +240,16 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 
 	case RequestTypeRemoveTask:
 		r, err := RemoveTaskRequest_FromProto(data.Request.Payload)
-		fmt.Println(r.Verification.Username)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		if !does_user_exist(r.Verification.Username, user_map) {
-			generate_and_send_error("Sender username isn't registered", data)
-			return
-		}
-		if !user_map.Verify(r.Verification) {
+
+		if !user_map.VerifyToken(r.Verification) {
 			generate_and_send_error("Incorrect Username or password", data)
 			return
 		}
-		user := user_map.Value(r.Verification.Username.toString())
+		user, _ := user_map.Value(r.Verification.UserID)
 		user.RemoveTask(r.TaskID)
 		generate_and_send_success(data)
 		return
@@ -263,15 +260,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-		if !does_user_exist(r.Verification.Username, user_map) {
-			generate_and_send_error("Sender username isn't registered", data)
-			return
-		}
-		if !user_map.Verify(r.Verification) {
+		if !user_map.VerifyToken(r.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
-		user := user_map.Value(r.Verification.Username.toString())
+		user, _ := user_map.Value(r.Verification.UserID)
+
 		user.ClearTasks()
 		generate_and_send_success(data)
 		return
@@ -283,15 +277,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-		if !does_user_exist(r.Verification.Username, user_map) {
-			generate_and_send_error("Sender username isn't registered", data)
-			return
-		}
-		if !user_map.Verify(r.Verification) {
+
+		if !user_map.VerifyToken(r.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
-		user := user_map.Value(r.Verification.Username.toString())
+		user, _ := user_map.Value(r.Verification.UserID)
 		flipTaskState(user.UserID, r.TaskID)
 		generate_and_send_success(data)
 		return
@@ -301,7 +292,8 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 }
 
 func generate_globally_unique_task_ID(task Task, user_map *UserMap) *Uint128 {
-	task_user := user_map.Value(task.TargetUsername.toString())
+	task_user, _ := user_map.Value(task.TargetUsername.toString())
+
 	return task.Generate_globally_unique_task_ID(task_user.UserID)
 }
 

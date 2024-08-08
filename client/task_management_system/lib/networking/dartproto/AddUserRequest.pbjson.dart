@@ -17,13 +17,12 @@ import 'dart:typed_data' as $typed_data;
 const AddUserRequest$json = {
   '1': 'AddUserRequest',
   '2': [
-    {'1': 'username', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.Username', '10': 'username'},
-    {'1': 'password', '3': 2, '4': 1, '5': 12, '10': 'password'},
+    {'1': 'verification', '3': 1, '4': 1, '5': 11, '6': '.taskmanager.pb.InitialVerification', '10': 'verification'},
   ],
 };
 
 /// Descriptor for `AddUserRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List addUserRequestDescriptor = $convert.base64Decode(
-    'Cg5BZGRVc2VyUmVxdWVzdBI0Cgh1c2VybmFtZRgBIAEoCzIYLnRhc2ttYW5hZ2VyLnBiLlVzZX'
-    'JuYW1lUgh1c2VybmFtZRIaCghwYXNzd29yZBgCIAEoDFIIcGFzc3dvcmQ=');
+    'Cg5BZGRVc2VyUmVxdWVzdBJHCgx2ZXJpZmljYXRpb24YASABKAsyIy50YXNrbWFuYWdlci5wYi'
+    '5Jbml0aWFsVmVyaWZpY2F0aW9uUgx2ZXJpZmljYXRpb24=');
 
