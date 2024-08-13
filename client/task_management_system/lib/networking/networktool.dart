@@ -9,35 +9,59 @@ import 'standards/request.dart';
 Future<Request_Type> handleSingleTCPExchange(
     Uint8List data, String host, int port,
     {int timeout = 2}) async {
-  Socket socket = await Socket.connect(host, port);
-  BufferedSocket bufferedSocket = BufferedSocket(socket);
   final completer = Completer<Request_Type>();
+  Socket? socket;
+  BufferedSocket? bufferedSocket;
 
   try {
+    // Connect with a timeout
+    socket =
+        await Socket.connect(host, port).timeout(Duration(seconds: timeout));
+    bufferedSocket = BufferedSocket(socket);
+
     // Send the data
     socket.add(data);
     await socket.flush();
     print('Sent ${data.length} bytes');
-    Timer closeTimer = Timer(Duration(seconds: timeout), () async {
-      await bufferedSocket.close();
-      completer.complete(Request_Type(254, 0, Uint8List(0)));
+
+    // Start the timeout timer for receiving data
+    Timer closeTimer = Timer(Duration(seconds: timeout), () {
+      print('Timeout reached, closing connection');
+      if (!completer.isCompleted) {
+        completer.complete(Request_Type(254, 0, Uint8List(0)));
+      }
     });
 
-    var parsedRequest = await parseRequest(bufferedSocket);
-
+    var parsedRequest =
+        await parseRequest(bufferedSocket).timeout(Duration(seconds: timeout));
     closeTimer.cancel();
-    completer.complete(Request_Type(
-        parsedRequest.type, parsedRequest.payloadSize, parsedRequest.payload));
-    return completer.future;
+
+    if (!completer.isCompleted) {
+      completer.complete(Request_Type(parsedRequest.type,
+          parsedRequest.payloadSize, parsedRequest.payload));
+    }
   } on SocketException catch (socketError) {
-    completer.complete(Request_Type(253, 0, Uint8List(0)));
-    return completer.future;
+    print("Socket error: $socketError");
+    if (!completer.isCompleted) {
+      completer.complete(Request_Type(253, 0, Uint8List(0)));
+    }
+  } on TimeoutException {
+    print("Connection or operation timed out");
+    if (!completer.isCompleted) {
+      completer.complete(Request_Type(254, 0, Uint8List(0)));
+    }
   } catch (e) {
-    rethrow;
+    print("Unexpected error: $e");
+    if (!completer.isCompleted) {
+      completer.completeError(e);
+    }
   } finally {
-    await bufferedSocket.close();
+    await bufferedSocket?.close();
+    await socket?.close();
     print('Connection closed');
   }
+
+  return completer.future;
 }
 
 class PartialRequest {

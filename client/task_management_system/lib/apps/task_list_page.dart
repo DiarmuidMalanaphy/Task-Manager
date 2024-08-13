@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_management_system/apps/splash_page.dart';
+import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import 'package:task_management_system/networking/standards/Task.dart';
 import 'package:task_management_system/apps/add_task_page.dart';
@@ -53,7 +54,7 @@ class _TaskListPageState extends State<TaskListPage> {
   Future<bool> _deleteTasks() async {
     bool success = true;
     for (int taskId in _selectedTasks) {
-      if (!await widget.tms.removeTask(taskId)) {
+      if (!(await widget.tms.removeTask(taskId)).success) {
         success = false;
       }
     }
@@ -62,11 +63,11 @@ class _TaskListPageState extends State<TaskListPage> {
   }
 
   Future<bool> _completeTask(int taskID) async {
-    bool success = await widget.tms.flipTaskStatus(taskID.toInt());
+    ReturnError success = await widget.tms.flipTaskStatus(taskID.toInt());
 
     // await widget.tms.completeTask(taskId);
     _refreshTasks();
-    return success;
+    return success.success;
   }
 
   Future<void> _completeSelectedTasks() async {
@@ -191,9 +192,10 @@ class _TaskListPageState extends State<TaskListPage> {
                   },
                   onDelete: () async {
                     bool success = false;
+                    ReturnError err;
                     if (_selectedTasks.length < 1) {
-                      success =
-                          await widget.tms.removeTask(task.taskID.toInt());
+                      err = await (widget.tms.removeTask(task.taskID.toInt()));
+                      success = err.success;
                     } else {
                       success = await _deleteTasks();
                     }

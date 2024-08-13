@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 
 class AddTaskPage extends StatefulWidget {
@@ -249,10 +250,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
     if (_isAddingToOtherUser &&
         widget.tms.username != null &&
         _targetUsernameController.text != widget.tms.username.toString()) {
-      bool userExists =
-          await widget.tms.verifyUserExists(_targetUsernameController.text);
+      ReturnError err;
+      err = await widget.tms.verifyUserExists(_targetUsernameController.text);
       setState(() {
-        _isUserVerified = userExists;
+        _isUserVerified = err.success;
       });
     }
   }
@@ -262,8 +263,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
       var filterOne = _combineFilters();
       var filterTwo = 0;
       var username = await widget.tms.username;
-      print(username);
-      bool success = await widget.tms.addTask(
+      ReturnError success = await widget.tms.addTask(
         _taskNameController.text,
         _descriptionController.text,
         _targetUsernameController.text,
@@ -272,14 +272,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
         filterTwo,
       );
 
-      if (success) {
+      if (success.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Task added successfully')),
         );
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add task')),
+          SnackBar(content: Text(success.message)),
         );
       }
     }

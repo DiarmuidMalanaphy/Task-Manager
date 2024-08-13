@@ -9,13 +9,11 @@ class Auth {
   static const String _boxName = 'auth_box';
   static const String _baseVerificationKey = 'base_verification';
   static const String _verificationTokenKey = 'verification_token';
-
+  static const String _ipAddressKey = 'ip_address';
   late Box<dynamic> _box;
-
   Auth() {
     _box = Hive.box(_boxName);
   }
-
   void storeInitialVerification(
       Initialisation_Verification_Type baseVerification) {
     _box.put(_baseVerificationKey, baseVerification.toProto.writeToBuffer());
@@ -63,8 +61,25 @@ class Auth {
     return getVerificationToken()?.userID;
   }
 
+  void setIPAddress(String ipAddress) {
+    _box.put(_ipAddressKey, ipAddress);
+  }
+
+  String? getIPAddress() {
+    return _box.get(_ipAddressKey) as String?;
+  }
+
+  bool hasIPAddress() {
+    return _box.containsKey(_ipAddressKey);
+  }
+
+  void clearIPAddress() {
+    _box.delete(_ipAddressKey);
+  }
+
   void clear() {
     _box.delete(_baseVerificationKey);
     _box.delete(_verificationTokenKey);
+    _box.delete(_ipAddressKey);
   }
 }

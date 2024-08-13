@@ -10,6 +10,7 @@ import 'standards/VerifyUserExists.dart';
 import 'standards/RemoveTaskRequest.dart';
 import 'standards/PollUserRequest.dart';
 import 'dart:typed_data';
+import 'error.dart';
 import 'standards/Task.dart';
 import 'standards/request.dart';
 import 'standards/utility.dart';
@@ -17,20 +18,22 @@ import 'networktool.dart';
 
 class TaskManagementSystem {
   final Auth _auth;
-  TaskManagementSystem(this._auth);
+  late String targetIP;
+  TaskManagementSystem(this._auth) {
+    String? grabbedIP = _auth.getIPAddress();
+    targetIP = (grabbedIP != null) ? grabbedIP : "192.168.0.66";
+  }
 
-  final targetIP =
-      "192.168.0.66"; // Should add an IP address that is verified to work on the initial login stage or, have it such that it pings the IP address a few times to see if it will reply.
+  //final targetIP = _auth "192.168.0.66"; // Should add an IP address that is verified to work on the initial login stage or, have it such that it pings the IP address a few times to see if it will reply.
 
 //          UTILITY FUNCTIONS
-  bool logError(Request_Type request) {
+  ReturnError logError(Request_Type request) {
     //True if there is no error from the server
     if (request.type == 200 || request.type == 220) {
-      return true;
+      return ReturnError(true, "");
     }
     if (request.type == 254 || request.type == 253) {
-      throw ArgumentError(
-          "Socket Not available -> Indicates Server turned off");
+      return ReturnError(false, "Cannot Connect to server at ${targetIP} ");
     }
 
     if (request.type != 255) {
@@ -40,7 +43,7 @@ class TaskManagementSystem {
     Error_Type error = Error_Type.fromBuffer(request.payload);
     print("Error Logged by TMS: ${error.errorMessage} ");
 
-    return false;
+    return ReturnError(false, error.errorMessage);
   }
 
   Initialisation_Verification_Type? get userdata {
@@ -61,14 +64,14 @@ class TaskManagementSystem {
 
 //NETWORKING FUNCTIONS
 
-  Future<bool> pingAlive() async {
+  Future<ReturnError> pingAlive() async {
     Uint8List empty = Uint8List(0);
     var req = serialiseRequest(1, empty);
     Request_Type reply = await handleSingleTCPExchange(req, targetIP, 5050);
     return logError(reply);
   }
 
-  Future<bool> registerUser(String username, String password) async {
+  Future<ReturnError> registerUser(String username, String password) async {
     var request = AddUserRequest_Type(
       username,
       password,
@@ -77,8 +80,8 @@ class TaskManagementSystem {
     var req = serialiseRequest(2, request.serialise);
     Request_Type reply = await handleSingleTCPExchange(req, targetIP, 5050);
 
-    bool err = logError(reply);
-    if (err) {
+    ReturnError err = logError(reply);
+    if (err.success) {
       _auth.storeInitialVerification(Initialisation_Verification_Type(
           request.verification.username, request.verification.hash));
       _auth.storeVerificationToken(
@@ -87,7 +90,7 @@ class TaskManagementSystem {
     return err;
   }
 
-  Future<bool> verifyUserExists(String username) async {
+  Future<ReturnError> verifyUserExists(String username) async {
     // Create a VerifyUserExistsRequest
     var request =
         VerifyUserExistsRequest_Type(Username_Type.fromString(username));
@@ -100,12 +103,13 @@ class TaskManagementSystem {
     return logError(reply);
   }
 
-  Future<bool> getAuthToken(Initialisation_Verification_Type veri) async {
+  Future<ReturnError> getAuthToken(
+      Initialisation_Verification_Type veri) async {
     LoginRequest_Type request = LoginRequest_Type(veri);
     var req = serialiseRequest(6, request.serialise);
     Request_Type reply = await handleSingleTCPExchange(req, targetIP, 5050);
-    bool err = logError(reply);
-    if (err) {
+    ReturnError err = logError(reply);
+    if (err.success) {
       _auth.storeVerificationToken(
           Verification_Token_Type.fromProto(reply.payload));
     }
@@ -120,7 +124,7 @@ class TaskManagementSystem {
 
     var reply = await handleSingleTCPExchange(req, targetIP, 5050);
 
-    bool err = logError(reply);
+    bool err = logError(reply).success;
 
     if (err) {
       return deserialiseTasks(reply.payload);
@@ -129,8 +133,13 @@ class TaskManagementSystem {
     }
   }
 
-  Future<bool> addTask(String taskName, String taskDesc, String setterUsername,
-      String targetUsername, int filterone, int filtertwo) async {
+  Future<ReturnError> addTask(
+      String taskName,
+      String taskDesc,
+      String setterUsername,
+      String targetUsername,
+      int filterone,
+      int filtertwo) async {
     var task = Task_Type(
       Int64(0),
       Username_Type.fromString(taskName),
@@ -150,7 +159,7 @@ class TaskManagementSystem {
     return logError(reply);
   }
 
-  Future<bool> removeTask(int taskID) async {
+  Future<ReturnError> removeTask(int taskID) async {
     var token = await _auth.getVerificationToken();
     var removeTaskRequest = RemoveTaskRequest_Type(token!, taskID);
 
@@ -160,7 +169,7 @@ class TaskManagementSystem {
     return logError(reply);
   }
 
-  Future<bool> flipTaskStatus(int taskID) async {
+  Future<ReturnError> flipTaskStatus(int taskID) async {
     var token = await _auth.getVerificationToken();
     var removeTaskRequest = RemoveTaskRequest_Type(token!, taskID);
     var req = serialiseRequest(20, removeTaskRequest.serialise);
