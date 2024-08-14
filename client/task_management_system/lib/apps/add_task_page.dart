@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
+import 'filter_constants.dart';
 
 class AddTaskPage extends StatefulWidget {
   final TaskManagementSystem tms;
@@ -13,7 +14,8 @@ class AddTaskPage extends StatefulWidget {
   _AddTaskPageState createState() => _AddTaskPageState();
 }
 
-class _AddTaskPageState extends State<AddTaskPage> {
+class _AddTaskPageState extends State<AddTaskPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _taskNameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -22,19 +24,29 @@ class _AddTaskPageState extends State<AddTaskPage> {
   bool _isUserVerified = true;
   bool _isAddingToOtherUser = false;
 
-  List<String> filterNames = [
-    'Urgent',
-    'Important',
-    'Work',
-    'Phone',
-    'Laptop',
-    '30 Minutes',
-    '15 Minutes'
-  ];
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  List<String> filterNames = FilterConstants.filterNames;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _animation = Tween<double>(begin: 0, end: 10).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,15 +54,16 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add New Task'),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.blue[300]),
+        iconTheme: IconThemeData(color: Colors.white),
         titleTextStyle: TextStyle(
-          color: Colors.blue[300],
-          fontSize: 20,
+          color: Colors.white,
+          fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
       ),
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -59,135 +72,160 @@ class _AddTaskPageState extends State<AddTaskPage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: EdgeInsets.all(16.0),
-            children: [
-              TextFormField(
-                controller: _taskNameController,
-                decoration: InputDecoration(
-                  labelText: 'Task Name',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+        child: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.all(24.0),
+              children: [
+                AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, -_animation.value),
+                      child: child,
+                    );
+                  },
+                  child: Text(
+                    'Create a New Task',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(20),
-                  FilteringTextInputFormatter.allow(RegExp(r'[\x00-\x7F]')),
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a task name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  labelText: 'Task Description',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
+                SizedBox(height: 30),
+                _buildInputField(_taskNameController, 'Task Name'),
+                SizedBox(height: 16),
+                _buildInputField(_descriptionController, 'Task Description',
+                    maxLines: 3),
+                SizedBox(height: 24),
+                Text(
+                  'Filters:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.white,
                   ),
                 ),
-                maxLines: null,
-                minLines: 1,
-                keyboardType: TextInputType.multiline,
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(120),
-                  FilteringTextInputFormatter.allow(RegExp(r'[\x00-\x7F]')),
+                SizedBox(height: 8),
+                _buildFilterChips(),
+                SizedBox(height: 24),
+                _buildAddToOtherUserCheckbox(),
+                if (_isAddingToOtherUser) ...[
+                  SizedBox(height: 16),
+                  _buildInputField(
+                      _targetUsernameController, 'Target Username'),
                 ],
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Filters:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              _buildFilterChips(),
-              SizedBox(height: 16),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isAddingToOtherUser,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _isAddingToOtherUser = value ?? false;
-                        if (!_isAddingToOtherUser &&
-                            widget.tms.username != null) {
-                          _targetUsernameController.text =
-                              widget.tms.username.toString();
-                          _isUserVerified = true;
-                        } else {
-                          _targetUsernameController.clear();
-                          _isUserVerified = false;
-                        }
-                      });
-                    },
-                  ),
-                  Text('Add task to another user'),
-                ],
-              ),
-              if (_isAddingToOtherUser)
-                TextFormField(
-                  controller: _targetUsernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Target Username',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
+                SizedBox(height: 32),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue[600],
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    elevation: 5,
                   ),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(30),
-                    FilteringTextInputFormatter.allow(RegExp(r'[\x00-\x7F]')),
-                  ],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a target username';
-                    }
-                    if (!_isUserVerified) {
-                      return 'Invalid user';
-                    }
-                    return null;
-                  },
-                  onChanged: (value) {
-                    _updateUserVerification(value);
-                  },
+                  onPressed: _submitForm,
+                  child: Text('Add Task',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
-              SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-                ),
-                onPressed: () {
-                  if (_isAddingToOtherUser && !_isUserVerified) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text("The selected user doesn't exist")),
-                    );
-                  } else {
-                    _submitForm();
-                  }
-                },
-                child: Text('Add Task', style: TextStyle(fontSize: 18)),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInputField(TextEditingController controller, String label,
+      {int maxLines = 1}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.transparent,
+        ),
+        maxLines: maxLines,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter $label';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilterChips() {
+    return Wrap(
+      spacing: 8.0,
+      runSpacing: 8.0,
+      children: List.generate(filterNames.length, (index) {
+        return FilterChip(
+          label: Text(filterNames[index]),
+          selected: _selectedFilters.contains(index),
+          onSelected: (bool selected) {
+            setState(() {
+              if (selected) {
+                _selectedFilters.add(index);
+              } else {
+                _selectedFilters.remove(index);
+              }
+            });
+          },
+          backgroundColor: Colors.white.withOpacity(0.7),
+          selectedColor: Colors.blue[200],
+          checkmarkColor: Colors.blue[800],
+          labelStyle: TextStyle(color: Colors.blue[800]),
+        );
+      }),
+    );
+  }
+
+  Widget _buildAddToOtherUserCheckbox() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: CheckboxListTile(
+        title: Text('Add task to another user'),
+        value: _isAddingToOtherUser,
+        onChanged: (bool? value) {
+          setState(() {
+            _isAddingToOtherUser = value ?? false;
+            if (!_isAddingToOtherUser && widget.tms.username != null) {
+              _targetUsernameController.text = widget.tms.username.toString();
+              _isUserVerified = true;
+            } else {
+              _targetUsernameController.clear();
+              _isUserVerified = false;
+            }
+          });
+        },
       ),
     );
   }
@@ -212,38 +250,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
     }
   }
 
-  Widget _buildFilterChips() {
-    return Wrap(
-      spacing: 8.0,
-      children: List.generate(filterNames.length, (index) {
-        return FilterChip(
-          label: Text(filterNames[index]),
-          selected: _selectedFilters.contains(index),
-          onSelected: (bool selected) {
-            setState(() {
-              if (selected) {
-                _selectedFilters.add(index);
-              } else {
-                _selectedFilters.remove(index);
-              }
-            });
-          },
-        );
-      }),
-    );
-  }
-
   Timer? _debounceTimer;
 
   void _debounceVerifyUser() {
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 500), _verifyUser);
-  }
-
-  @override
-  void dispose() {
-    _debounceTimer?.cancel();
-    super.dispose();
   }
 
   void _verifyUser() async {

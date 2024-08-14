@@ -15,14 +15,42 @@ import 'standards/Task.dart';
 import 'standards/request.dart';
 import 'standards/utility.dart';
 import 'networktool.dart';
+import 'dart:io';
 
 class TaskManagementSystem {
   final Auth _auth;
   late String targetIP;
   TaskManagementSystem(this._auth) {
+    _initializeIP();
+  }
+  Future<void> _initializeIP() async {
     String? grabbedIP = _auth.getIPAddress();
-    print(grabbedIP);
-    targetIP = (grabbedIP != null) ? grabbedIP : "192.168.0.66";
+    if (grabbedIP == null) {
+      try {
+        targetIP = await _resolveIPAddress("diarmuidmalanaphy.co.uk");
+      } catch (e) {
+        // If DNS resolution fails, default to 0.0.0.0
+        print('Failed to resolve IP address: $e');
+        targetIP = "0.0.0.0";
+      }
+    } else {
+      targetIP = grabbedIP;
+    }
+    print('Resolved IP: $targetIP');
+  }
+
+  Future<String> _resolveIPAddress(String hostname) async {
+    try {
+      final List<InternetAddress> addresses =
+          await InternetAddress.lookup(hostname);
+      if (addresses.isNotEmpty) {
+        return addresses.first.address;
+      }
+    } catch (e) {
+      print('Failed to resolve IP address: $e');
+    }
+    // Fallback to a default IP address if resolution fails
+    return "192.168.0.66";
   }
 
   //final targetIP = _auth "192.168.0.66"; // Should add an IP address that is verified to work on the initial login stage or, have it such that it pings the IP address a few times to see if it will reply.

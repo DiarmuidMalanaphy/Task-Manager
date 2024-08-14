@@ -140,7 +140,7 @@ class _SplashPageState extends State<SplashPage>
                       );
                     },
                     child: Text(
-                      'Task Management System',
+                      "Diarmuid's GTD App",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
