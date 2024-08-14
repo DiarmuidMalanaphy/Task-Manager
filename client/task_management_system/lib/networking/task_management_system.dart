@@ -21,6 +21,7 @@ class TaskManagementSystem {
   late String targetIP;
   TaskManagementSystem(this._auth) {
     String? grabbedIP = _auth.getIPAddress();
+    print(grabbedIP);
     targetIP = (grabbedIP != null) ? grabbedIP : "192.168.0.66";
   }
 
