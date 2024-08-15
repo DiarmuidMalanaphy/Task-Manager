@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.22.6
 
 require (
-	github.com/DiarmuidMalanaphy/networktools v0.3.20
+	github.com/DiarmuidMalanaphy/networktools v0.4.1
 	go.etcd.io/bbolt v1.3.10
 	google.golang.org/protobuf v1.34.2
 )
