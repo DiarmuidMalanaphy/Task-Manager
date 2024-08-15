@@ -103,18 +103,19 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeRemoveUser:
-		r, err := RemoveUserRequest_FromProto(data.Request.Payload)
+		t, err := VerificationToken_FromBytes(data.Request.Payload)
+
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		if !user_map.VerifyToken(r.VerificationToken) {
+		if !user_map.VerifyToken(t) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
 
-		user_map.Remove(r.VerificationToken.UserID)
+		user_map.Remove(t.UserID)
 		generate_and_send_success(data)
 		return
 
@@ -194,18 +195,19 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeVerifyToken:
-		t, err := VerificationToken_FromProto(data.Request.Payload)
-
+		t, err := VerificationToken_FromBytes(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		if !user_map.VerifyToken(t.Verification) {
+
+		if !user_map.VerifyToken(t) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
 		}
 		generate_and_send_success(data)
+		return
 
 	case RequestTypeAddTask:
 		r, err := AddTaskRequest_FromProto(data.Request.Payload)

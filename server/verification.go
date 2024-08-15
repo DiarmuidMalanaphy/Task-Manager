@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
 	"time"
+	"google.golang.org/protobuf/proto"
+
 )
 
 type InitialVerification struct {
@@ -63,4 +65,19 @@ func VerificationToken_FromProto(token *pb.VerificationToken) (VerificationToken
 	vt.UserID = token.UserID
 	vt.Expires = token.Expires
 	return vt, nil
+}
+
+func VerificationToken_FromBytes(data []byte) (VerificationToken, error) {
+	var protobuf_request pb.VerificationToken
+	err := proto.Unmarshal(data, &protobuf_request)
+	if err != nil {
+		return VerificationToken{}, err
+	}
+	token, err := VerificationToken_FromProto(&protobuf_request)
+	if err != nil {
+		return VerificationToken{}, err
+	}
+	return token, nil
+
+
 }

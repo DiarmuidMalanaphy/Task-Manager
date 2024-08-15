@@ -52,7 +52,6 @@ func LoadPreexisingUserMap() *UserMap {
 }
 
 func (um *UserMap) Add(user *User) error {
-	fmt.Println(um.usercount)
 	user_id := um.IncUserCount()
 	um.mu.Lock()
 	defer um.mu.Unlock()
@@ -78,11 +77,13 @@ func (um *UserMap) Remove(key interface{}) {
 		if user, exists := um.UserMap[v]; exists {
 			delete(um.UsernameMap, user.Username.toString())
 			delete(um.UserMap, v)
+			deleteTasksForUser(v)
 		}
 	case string:
 		if userID, exists := um.UsernameMap[v]; exists {
 			delete(um.UserMap, userID)
 			delete(um.UsernameMap, v)
+			deleteTasksForUser(userID) //Patching Exploit
 		}
 	}
 }
@@ -137,7 +138,6 @@ func (um *UserMap) VerifyToken(token VerificationToken) (exists bool) {
 	if ID != token.UserID {
 		return false
 	}
-	fmt.Println("HERED")
 
 	return true
 }
