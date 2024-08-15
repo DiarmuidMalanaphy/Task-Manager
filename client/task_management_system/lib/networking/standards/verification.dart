@@ -1,4 +1,5 @@
 import 'package:task_management_system/networking/dartproto/Verification.pb.dart';
+import 'package:task_management_system/networking/standards/datatypes.dart';
 import 'package:task_management_system/networking/standards/hash.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:task_management_system/networking/standards/username.dart';
@@ -43,6 +44,10 @@ class Verification_Token_Type {
       ..token = _token
       ..userID = _userID
       ..expires = _expiryDate;
+  }
+
+  Uint8List get serialise {
+    return toProto.writeToBuffer();
   }
 
   bool get withinDate {

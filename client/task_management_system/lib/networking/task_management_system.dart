@@ -1,4 +1,5 @@
 import 'package:task_management_system/networking/auth.dart';
+import 'package:task_management_system/networking/dartproto/Verification.pb.dart';
 import 'package:task_management_system/networking/standards/Error.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:task_management_system/networking/standards/LoginRequest.dart';
@@ -21,9 +22,9 @@ class TaskManagementSystem {
   final Auth _auth;
   late String targetIP;
   TaskManagementSystem(this._auth) {
-    _initializeIP();
+    initializeIP();
   }
-  Future<void> _initializeIP() async {
+  Future<void> initializeIP() async {
     String? grabbedIP = _auth.getIPAddress();
     if (grabbedIP == null) {
       try {
@@ -132,6 +133,17 @@ class TaskManagementSystem {
     return logError(reply);
   }
 
+  Future<ReturnError> verifyToken() async {
+    var request = _auth.getVerificationToken();
+    if (request == null) {
+      return ReturnError(false, "No token");
+    }
+    var networkRequest = serialiseRequest(7, request.serialise);
+    Request_Type reply =
+        await handleSingleTCPExchange(networkRequest, targetIP, 5050);
+    return logError(reply);
+  }
+
   Future<ReturnError> getAuthToken(
       Initialisation_Verification_Type veri) async {
     LoginRequest_Type request = LoginRequest_Type(veri);
@@ -180,7 +192,6 @@ class TaskManagementSystem {
       Int64(0),
     );
 
-    print("Personal Username ${setterUsername.toString()}");
     var token = await _auth.getVerificationToken();
     var addTaskRequest = AddTaskRequest_Type(token!, task);
     var req = serialiseRequest(16, addTaskRequest.serialise);

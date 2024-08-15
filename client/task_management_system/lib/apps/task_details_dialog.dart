@@ -9,6 +9,9 @@ void showTaskDetails(
   final statusMap = {0: 'Pending', 1: 'Completed'};
 
   final isOwnTask = task.setterUsername.toString() == tms.username!.toString();
+  print(
+      "Comparing ${task.setterUsername.toString()} and ${tms.username!.toString()}");
+  print(isOwnTask);
 
   showDialog(
     context: context,
