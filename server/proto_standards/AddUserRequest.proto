@@ -3,7 +3,7 @@ syntax = "proto3";
 package taskmanager.pb;
 import "Verification.proto";
 
-option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
+option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards";
 message AddUserRequest {
 	InitialVerification verification = 1;
 }

@@ -1,4 +1,4 @@
-module proto_standards
+module proto_server
 
 go 1.19
 

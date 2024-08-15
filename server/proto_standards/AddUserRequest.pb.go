@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: AddUserRequest.proto
 
-package standards
+package protostandards
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
