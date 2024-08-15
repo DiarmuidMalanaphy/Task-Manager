@@ -6,11 +6,10 @@ class BufferedSocket {
   List<int> _buffer = [];
 
   BufferedSocket(this._socket) {
-    _socket.listen(
-      (data) => _buffer.addAll(data),
-      onError: (error) => print('Error: $error'),
-      onDone: () => print('Socket closed'),
-    );
+    _socket.listen((data) => _buffer.addAll(data),
+        onError: (error) => print('Error: $error'),
+        onDone: () => {} //print('Socket closed'),
+        );
   }
 
   Future<Uint8List> readExactly(int n) async {
@@ -24,4 +23,3 @@ class BufferedSocket {
 
   Future<void> close() => _socket.close();
 }
-

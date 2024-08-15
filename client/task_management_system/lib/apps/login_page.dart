@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_system/apps/IPsettings.dart';
 import 'package:task_management_system/networking/auth.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/standards/username.dart';
@@ -8,11 +7,13 @@ import 'package:task_management_system/networking/standards/password.dart';
 import 'package:task_management_system/networking/standards/verification.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import 'package:task_management_system/apps/task_list_page.dart';
+import 'package:task_management_system/apps/background_manager.dart';
 
 class LoginPage extends StatelessWidget {
   final PageController pageController;
+  final BackgroundManager backgroundManager;
 
-  LoginPage({required this.pageController});
+  LoginPage({required this.pageController, required this.backgroundManager});
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -23,18 +24,31 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          backgroundManager.background,
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[100]!, Colors.blue[300]!],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            //  decoration: BoxDecoration(
+//              gradient: LinearGradient(
+//                begin: Alignment.topLeft,
+//                end: Alignment.bottomRight,
+//               colors: [
+//                  Colors.blue[100]!,
+//                  Colors.blue[300]!,
+//                  Colors.purple[100]!,
+//                  Colors.purple[300]!,
+//                ],
+//                stops: [0.0, 0.4, 0.7, 1.0],
+//              ),
+            //),
             child: Column(
               children: [
                 AppBar(
-                  title: Text('Login'),
+                  title: Text(
+                    'Login',
+                    style: TextStyle(
+                      color:
+                          Colors.blue[100], // This sets the color of the text
+                    ),
+                  ),
                   centerTitle: true,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -78,7 +92,12 @@ class LoginPage extends StatelessWidget {
                         SizedBox(height: 10),
                         TextButton(
                           child: Text(
-                              'Don\'t have an account? Swipe left to Register'),
+                            'Don\'t have an account? Swipe left to Register',
+                            style: TextStyle(
+                              color: Colors
+                                  .blue[100], // This sets the color of the text
+                            ),
+                          ),
                           onPressed: () {
                             pageController.animateToPage(
                               1,
@@ -92,19 +111,6 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: IconButton(
-              icon: Icon(Icons.settings, color: Colors.black54),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => IPSettings()),
-                );
-              },
             ),
           ),
         ],
@@ -126,7 +132,8 @@ class LoginPage extends StatelessWidget {
       tms.setVerification(verification);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TaskListPage(tms)),
+        MaterialPageRoute(
+            builder: (context) => TaskListPage(tms, backgroundManager)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

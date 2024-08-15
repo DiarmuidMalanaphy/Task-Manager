@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:task_management_system/networking/dartproto/request.pb.dart';
 import 'dart:async';
 import 'bufferedsocket.dart';
 import 'dart:typed_data';
@@ -22,11 +21,10 @@ Future<Request_Type> handleSingleTCPExchange(
     // Send the data
     socket.add(data);
     await socket.flush();
-    print('Sent ${data.length} bytes');
+    //print('Sent ${data.length} bytes');
 
     // Start the timeout timer for receiving data
     Timer closeTimer = Timer(Duration(seconds: timeout), () {
-      print('Timeout reached, closing connection');
       if (!completer.isCompleted) {
         completer.complete(Request_Type(254, 0, Uint8List(0)));
       }
@@ -58,7 +56,7 @@ Future<Request_Type> handleSingleTCPExchange(
   } finally {
     await bufferedSocket?.close();
     await socket?.close();
-    print('Connection closed');
+    //print('Connection closed');
   }
 
   return completer.future;

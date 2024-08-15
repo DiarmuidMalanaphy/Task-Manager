@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_system/apps/background_manager.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import '../networking/auth.dart';
@@ -19,6 +20,7 @@ class _SplashPageState extends State<SplashPage>
   bool _showButtons = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
+  final BackgroundManager _backgroundManager = BackgroundManager();
 
   @override
   void initState() {
@@ -71,7 +73,6 @@ class _SplashPageState extends State<SplashPage>
         await _loginWithVerification();
       }
     } catch (e) {
-      print('Error logging in with token: $e');
       _showErrorSnackBar(context, 'An unexpected error occurred.');
       await _loginWithVerification();
     }
@@ -107,7 +108,6 @@ class _SplashPageState extends State<SplashPage>
         _showLoginOptions();
       }
     } catch (e) {
-      print('Error logging in with verification: $e');
       _showLoginOptions();
     }
   }
@@ -125,23 +125,19 @@ class _SplashPageState extends State<SplashPage>
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TaskListPage(_tms)),
+        MaterialPageRoute(
+            builder: (context) => TaskListPage(_tms, _backgroundManager)),
       );
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[100]!, Colors.blue[300]!],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+          _backgroundManager.background,
+          SafeArea(
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -156,69 +152,82 @@ class _SplashPageState extends State<SplashPage>
                     },
                     child: Text(
                       "Diarmuid's GTD App",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 10.0,
+                            color: Colors.black.withOpacity(0.3),
+                            offset: Offset(2.0, 2.0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 50),
                   if (_showButtons) ...[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 24.0),
-                      ),
-                      child: Text('Login', style: TextStyle(fontSize: 18)),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AuthPage(initialPage: 0)),
-                        );
-                      },
-                    ),
+                    _buildButton('Login', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AuthPage(
+                                initialPage: 0,
+                                backgroundManager: _backgroundManager)),
+                      );
+                    }),
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 24.0),
-                      ),
-                      child: Text('Register', style: TextStyle(fontSize: 18)),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AuthPage(initialPage: 1)),
-                        );
-                      },
-                    ),
+                    _buildButton('Register', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AuthPage(
+                                  initialPage: 1,
+                                  backgroundManager: _backgroundManager,
+                                )),
+                      );
+                    }),
                   ],
                 ],
               ),
             ),
           ),
-          if (_showButtons) ...[
+          if (_showButtons)
             Positioned(
               top: 40,
               right: 20,
               child: IconButton(
-                icon: Icon(Icons.settings, color: Colors.black54),
+                icon: Icon(Icons.settings, color: Colors.white),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => IPSettings()),
+                    MaterialPageRoute(
+                        builder: (context) => IPSettings(
+                              backgroundManager: _backgroundManager,
+                            )),
                   );
                 },
               ),
             ),
-          ]
         ],
       ),
+    );
+  }
+
+  Widget _buildButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.purple.withOpacity(0.6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+        elevation: 5,
+      ),
+      child: Text(text, style: TextStyle(fontSize: 18)),
+      onPressed: onPressed,
     );
   }
 }

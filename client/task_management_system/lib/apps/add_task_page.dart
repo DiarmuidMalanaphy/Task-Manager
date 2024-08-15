@@ -1,53 +1,32 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:task_management_system/apps/background_manager.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
 import 'filter_constants.dart';
 
 class AddTaskPage extends StatefulWidget {
   final TaskManagementSystem tms;
+  final BackgroundManager bm;
 
-  AddTaskPage({Key? key, required this.tms}) : super(key: key);
+  AddTaskPage({Key? key, required this.tms, required this.bm})
+      : super(key: key);
 
   @override
   _AddTaskPageState createState() => _AddTaskPageState();
 }
 
-class _AddTaskPageState extends State<AddTaskPage>
-    with SingleTickerProviderStateMixin {
+class _AddTaskPageState extends State<AddTaskPage> {
   final _formKey = GlobalKey<FormState>();
   final _taskNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _targetUsernameController = TextEditingController();
   Set<int> _selectedFilters = Set<int>();
-  bool _isUserVerified = true;
   bool _isAddingToOtherUser = false;
-
-  late AnimationController _animationController;
-  late Animation<double> _animation;
+  bool _isUserVerified = false;
 
   List<String> filterNames = FilterConstants.filterNames;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 0, end: 10).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,81 +43,73 @@ class _AddTaskPageState extends State<AddTaskPage>
         ),
       ),
       extendBodyBehindAppBar: true,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue[100]!, Colors.blue[300]!],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: EdgeInsets.all(24.0),
-              children: [
-                AnimatedBuilder(
-                  animation: _animation,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0, -_animation.value),
-                      child: child,
-                    );
-                  },
-                  child: Text(
-                    'Create a New Task',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+      body: Stack(
+        children: [
+          // Background animation
+          widget.bm.background, // Ensure this widget is defined
+
+          //// Foreground content
+          Container(
+            //  decoration: BoxDecoration(
+            //    gradient: LinearGradient(
+            //      colors: [Colors.blue[100]!, Colors.purple[100]!],
+            //      begin: Alignment.topCenter,
+            //      end: Alignment.bottomCenter,
+            //    ),
+            //  ),
+            child: SafeArea(
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  padding: EdgeInsets.all(24.0),
+                  children: [
+                    SizedBox(height: 30),
+                    _buildInputField(_taskNameController, 'Task Name'),
+                    SizedBox(height: 16),
+                    _buildInputField(_descriptionController, 'Task Description',
+                        maxLines: 3),
+                    SizedBox(height: 24),
+                    Text(
+                      'Filters:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 30),
-                _buildInputField(_taskNameController, 'Task Name'),
-                SizedBox(height: 16),
-                _buildInputField(_descriptionController, 'Task Description',
-                    maxLines: 3),
-                SizedBox(height: 24),
-                Text(
-                  'Filters:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8),
-                _buildFilterChips(),
-                SizedBox(height: 24),
-                _buildAddToOtherUserCheckbox(),
-                if (_isAddingToOtherUser) ...[
-                  SizedBox(height: 16),
-                  _buildInputField(
-                      _targetUsernameController, 'Target Username'),
-                ],
-                SizedBox(height: 32),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue[600],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
+                    SizedBox(height: 8),
+                    _buildFilterChips(),
+                    SizedBox(height: 24),
+                    _buildAddToOtherUserCheckbox(),
+                    if (_isAddingToOtherUser) ...[
+                      SizedBox(height: 16),
+                      _buildInputField(
+                          _targetUsernameController, 'Target Username'),
+                    ],
+                    SizedBox(height: 32),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.purple[100],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        elevation: 5,
+                      ),
+                      onPressed: _submitForm,
+                      child: Text(
+                        'Add Task',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    elevation: 5,
-                  ),
-                  onPressed: _submitForm,
-                  child: Text('Add Task',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

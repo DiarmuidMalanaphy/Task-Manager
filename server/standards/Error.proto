@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package taskmanager.pb;
+
+option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
+
+message Error {
+	bytes error = 1;
+}
+

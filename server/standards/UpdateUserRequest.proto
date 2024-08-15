@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package taskmanager.pb;
+import "Username.proto";
+import "Verification.proto";
+option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
+
+message UpdateUserRequest {
+	Username username = 1;
+	VerificationToken token = 2;
+}
+

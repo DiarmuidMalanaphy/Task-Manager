@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_system/apps/background_manager.dart';
 import 'package:task_management_system/apps/splash_page.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
@@ -9,31 +10,57 @@ import 'task_tile.dart';
 
 class TaskListPage extends StatefulWidget {
   final TaskManagementSystem tms;
-  TaskListPage(this.tms);
+  final BackgroundManager bm;
+  TaskListPage(this.tms, this.bm);
   @override
-  _TaskListPageState createState() => _TaskListPageState();
+  TaskListPageState createState() => TaskListPageState();
 }
 
-class _TaskListPageState extends State<TaskListPage> {
-  List<Task_Type> _tasks = [];
+class TaskListPageState extends State<TaskListPage> {
+  late List<Task_Type> _tasks = [];
   List<Task_Type> _filteredTasks = [];
   ScrollController _scrollController = ScrollController();
   Set<int> _selectedTasks = {};
   bool _isHovering = false;
   bool _showCompletedTasks = false;
+  final GlobalKey<TaskFiltersState> _filtersKey = GlobalKey<TaskFiltersState>();
+
+  late final Widget _filters;
 
   @override
   void initState() {
     super.initState();
+    _filters = TaskFilters(
+        key: _filtersKey,
+        taskListPage: this,
+        onFilterApplied: _handleFilterApplied);
+
     _refreshTasks();
+  }
+
+  void _applyFilters() {
+    setState(() {
+      final filtersState = _filtersKey.currentState;
+      if (filtersState != null) {
+        filtersState.applyFilters();
+      }
+    });
+  }
+
+  List<Task_Type> get getTasks {
+    return _tasks;
+  }
+
+  void setTasks(List<Task_Type> tasks) {
+    _tasks = tasks;
   }
 
   Future<void> _refreshTasks() async {
     try {
-      final tasks = await widget.tms.pollTasks(0);
+      setTasks(await widget.tms.pollTasks(0));
       setState(() {
-        _tasks = tasks;
-        _filteredTasks = tasks;
+        _filteredTasks = getTasks;
+        _applyFilters();
       });
     } catch (e) {
       print(e);
@@ -81,70 +108,102 @@ class _TaskListPageState extends State<TaskListPage> {
     _refreshTasks();
   }
 
+  void _deselectAll() {
+    setState(() {
+      _selectedTasks.clear(); // Correct way to clear a Set
+    });
+  }
+
+  void _selectAll() {
+    setState(() {
+      for (var task
+          in _filteredTasks.where((task) => task.status != 1).toList()) {
+        _selectedTasks.add(task.taskID.toInt());
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Splitting tasks into pending and completed
     List<Task_Type> pendingTasks =
         _filteredTasks.where((task) => task.status != 1).toList();
     List<Task_Type> completedTasks =
         _filteredTasks.where((task) => task.status == 1).toList();
 
     return Scaffold(
-      endDrawer: _buildSettingsSidebar(),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue[100]!, Colors.blue[300]!],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              AppBar(
-                title: Text('Tasks', style: TextStyle(fontSize: 24)),
-                centerTitle: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.check_circle),
-                    onPressed: _selectedTasks.isNotEmpty
-                        ? _completeSelectedTasks
-                        : null,
-                  ),
-                  Builder(
-                    builder: (context) => IconButton(
-                      icon: Icon(Icons.menu),
-                      onPressed: () => Scaffold.of(context).openEndDrawer(),
+      endDrawer: _buildSettingsSidebar(), // Ensure this method is defined
+      body: Stack(
+        children: [
+          widget.bm.background,
+          Container(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  _buildAppBar(), // Ensure this method is defined
+                  _filters,
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _refreshTasks, // Ensure this method is defined
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        child: ListView(
+                          physics: BouncingScrollPhysics(),
+                          controller: _scrollController,
+                          children: [
+                            _buildTaskList(pendingTasks, "Pending Tasks",
+                                display_empty:
+                                    true), // Ensure this method is defined
+                            _buildTaskList(completedTasks,
+                                "Completed Tasks"), // Ensure this method is defined
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-              TaskFilters(tasks: _tasks, onFilterApplied: _handleFilterApplied),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refreshTasks,
-                  child: Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    child: ListView(
-                      physics: BouncingScrollPhysics(),
-                      controller: _scrollController,
-                      children: [
-                        _buildTaskList(pendingTasks, "Pending Tasks",
-                            display_empty: true),
-                        _buildTaskList(completedTasks, "Completed Tasks"),
-                      ],
-                    ),
-                  ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton:
+          _buildFloatingActionButton(), // Ensure this method is defined
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Tasks',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.check_circle, color: Colors.green),
+                onPressed:
+                    _selectedTasks.isNotEmpty ? _deselectAll : _selectAll,
+              ),
+              Builder(
+                builder: (context) => IconButton(
+                  icon: Icon(Icons.menu, color: Colors.black87),
+                  onPressed: () => Scaffold.of(context).openEndDrawer(),
                 ),
               ),
             ],
           ),
-        ),
+        ],
       ),
-      floatingActionButton: _buildFloatingActionButton(),
     );
   }
 
@@ -156,8 +215,15 @@ class _TaskListPageState extends State<TaskListPage> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +232,11 @@ class _TaskListPageState extends State<TaskListPage> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
             ),
           ),
           if (tasks.isEmpty && display_empty)
@@ -224,58 +294,158 @@ class _TaskListPageState extends State<TaskListPage> {
 
   Widget _buildSettingsSidebar() {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[300]!, Colors.blue[600]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
+      child: Container(
+        constraints: BoxConstraints.expand(),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue[50]!, Colors.purple[50]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  'Settings',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                _buildUserHeader(),
+                SwitchListTile(
+                  title: Text('Show Completed Tasks'),
+                  subtitle: Text('Display or hide completed tasks in the list'),
+                  value: _showCompletedTasks,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _showCompletedTasks = value;
+                    });
+                  },
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Username : ${widget.tms.username!.toString()}',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+                Divider(),
+                SwitchListTile(
+                  title: Text('Dark Mode'),
+                  subtitle: Text('Switch between dark and light mode'),
+                  value: widget.bm.darkMode,
+                  onChanged: (bool value) {
+                    setState(() {
+                      widget.bm.personalConfigManager.flipDarkModeConfig();
+                      widget.bm.updateBackground();
+                    });
+                  },
+                ),
+                Divider(),
+                SwitchListTile(
+                  title: Text('Animated Background'),
+                  subtitle: Text('Enable or disable animated background'),
+                  value: widget.bm.animated,
+                  onChanged: (bool value) {
+                    setState(() {
+                      widget.bm.personalConfigManager.flipAnimated();
+                      widget.bm.updateBackground();
+                    });
+                  },
+                ),
+                Divider(),
+                SwitchListTile(
+                  title: Text('Monkey Mode'),
+                  subtitle: Text('Enable or disable monkey mode background'),
+                  value: widget.bm.monkeyMode,
+                  onChanged: (bool value) {
+                    setState(() {
+                      widget.bm.personalConfigManager.flipMonkey();
+                      widget.bm.updateBackground();
+                    });
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout, color: Colors.red),
+                  title: Text('Logout', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    Navigator.pop(context); // Close the drawer
+                    _logout();
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.delete_forever, color: Colors.red),
+                  title: Text('Delete Account',
+                      style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    _confirmDeleteAccount();
+                  },
                 ),
               ],
             ),
           ),
-          SwitchListTile(
-            title: Text('Show Completed Tasks'),
-            subtitle: Text('Display or hide completed tasks in the list'),
-            value: _showCompletedTasks,
-            onChanged: (bool value) {
-              setState(() {
-                _showCompletedTasks = value;
-              });
-            },
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Account'),
+          content: Text(
+              'Are you sure you want to delete your account? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                widget.tms.deleteAccount();
+                _logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildUserHeader() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue[400]!, Colors.purple[400]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.white,
+            child: Text(
+              widget.tms.username!.toString()[0].toUpperCase(),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
           ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
-            onTap: () {
-              Navigator.pop(context); // Close the drawer
-              _logout();
-            },
+          SizedBox(height: 16),
+          Text(
+            'Welcome,',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            widget.tms.username!.toString(),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -331,13 +501,16 @@ class _TaskListPageState extends State<TaskListPage> {
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => AddTaskPage(tms: widget.tms)),
+                  builder: (context) => AddTaskPage(
+                        tms: widget.tms,
+                        bm: widget.bm,
+                      )),
             );
             if (result == true) {
               _refreshTasks();
             }
           },
-          backgroundColor: Colors.purple[700],
+          backgroundColor: Colors.blue[300],
           elevation: 8,
         ),
       ),

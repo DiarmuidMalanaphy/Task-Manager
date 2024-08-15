@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package taskmanager.pb;
+import "Verification.proto";
+option go_package = "github.com/DiarmuidMalanaphy/Task-Manager/standards";
+
+message PollUserRequest{
+	VerificationToken token = 1;
+	uint64 lastseentaskID = 2;
+}
+

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_system/apps/task_list_page.dart';
 import 'package:task_management_system/networking/standards/Task.dart';
 import 'filter_constants.dart';
 import 'dart:typed_data';
@@ -8,16 +9,20 @@ enum FilterLogic { AND, OR }
 enum FilterInclusion { Include, Exclude }
 
 class TaskFilters extends StatefulWidget {
-  final List<Task_Type> tasks;
+  final TaskListPageState taskListPage;
   final Function(List<Task_Type>) onFilterApplied;
 
-  TaskFilters({required this.tasks, required this.onFilterApplied});
+  TaskFilters({
+    Key? key,
+    required this.taskListPage,
+    required this.onFilterApplied,
+  }) : super(key: key);
 
   @override
-  _TaskFiltersState createState() => _TaskFiltersState();
+  TaskFiltersState createState() => TaskFiltersState();
 }
 
-class _TaskFiltersState extends State<TaskFilters> {
+class TaskFiltersState extends State<TaskFilters> {
   Set<int> _selectedFilters = {};
   FilterLogic _filterLogic = FilterLogic.OR;
   FilterInclusion _filterInclusion = FilterInclusion.Include;
@@ -25,16 +30,20 @@ class _TaskFiltersState extends State<TaskFilters> {
   String _searchQuery = '';
   bool _caseSensitive = false;
 
-  void _applyFilters() {
-    List<Task_Type> filteredTasks = _applyFiltersToTasks(
-      widget.tasks,
-      _selectedFilters,
-      _filterLogic,
-      _filterInclusion,
-      _searchQuery,
-      _caseSensitive,
-    );
-    widget.onFilterApplied(filteredTasks);
+  void applyFilters() {
+    if (_selectedFilters.isEmpty) {
+      widget.onFilterApplied(widget.taskListPage.getTasks);
+    } else {
+      List<Task_Type> filteredTasks = _applyFiltersToTasks(
+        widget.taskListPage.getTasks,
+        _selectedFilters,
+        _filterLogic,
+        _filterInclusion,
+        _searchQuery,
+        _caseSensitive,
+      );
+      widget.onFilterApplied(filteredTasks);
+    }
   }
 
   void _openFilterSettings() {
@@ -63,7 +72,7 @@ class _TaskFiltersState extends State<TaskFilters> {
                             setModalState(() {
                               _filterLogic = newValue;
                             });
-                            _applyFilters();
+                            applyFilters();
                           }
                         },
                         items: FilterLogic.values.map((FilterLogic logic) {
@@ -85,7 +94,7 @@ class _TaskFiltersState extends State<TaskFilters> {
                             setModalState(() {
                               _filterInclusion = newValue;
                             });
-                            _applyFilters();
+                            applyFilters();
                           }
                         },
                         items: FilterInclusion.values
@@ -108,7 +117,7 @@ class _TaskFiltersState extends State<TaskFilters> {
                           setModalState(() {
                             _caseSensitive = value;
                           });
-                          _applyFilters();
+                          applyFilters();
                         },
                       ),
                     ],
@@ -139,7 +148,7 @@ class _TaskFiltersState extends State<TaskFilters> {
                 ),
                 onChanged: (value) {
                   _searchQuery = value;
-                  _applyFilters();
+                  applyFilters();
                 },
               ),
             ),
@@ -162,7 +171,7 @@ class _TaskFiltersState extends State<TaskFilters> {
                         } else {
                           _selectedFilters.remove(index);
                         }
-                        _applyFilters();
+                        applyFilters();
                       });
                     },
                   ),

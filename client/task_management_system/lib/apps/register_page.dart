@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_system/apps/IPsettings.dart';
+import 'package:task_management_system/apps/background_manager.dart';
 import 'package:task_management_system/networking/auth.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
@@ -7,8 +7,9 @@ import 'package:task_management_system/apps/task_list_page.dart';
 
 class RegisterPage extends StatelessWidget {
   final PageController pageController;
+  final BackgroundManager backgroundManager;
 
-  RegisterPage({required this.pageController});
+  RegisterPage({required this.pageController, required this.backgroundManager});
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -20,18 +21,31 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          backgroundManager.background,
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[100]!, Colors.blue[300]!],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            //decoration: BoxDecoration(
+//              gradient: LinearGradient(
+//                begin: Alignment.topLeft,
+//                end: Alignment.bottomRight,
+//                colors: [
+//                  Color(0xFF1A237E),
+//                  Color(0xFF3949AB),
+//                  Color(0xFF5C6BC0),
+//                  Color(0xFF8E99F3),
+//                ],
+            //               stops: [0.0, 0.4, 0.7, 1.0],
+//              ),
+//            ),
             child: Column(
               children: [
                 AppBar(
-                  title: Text('Register'),
+                  title: Text(
+                    'Register',
+                    style: TextStyle(
+                      color:
+                          Colors.blue[100], // This sets the color of the text
+                    ),
+                  ),
                   centerTitle: true,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -74,7 +88,12 @@ class RegisterPage extends StatelessWidget {
                         SizedBox(height: 10),
                         TextButton(
                           child: Text(
-                              'Already have an account? Swipe right to Login'),
+                            'Already have an account? Swipe right to Login',
+                            style: TextStyle(
+                              color: Colors
+                                  .blue[100], // This sets the color of the text
+                            ),
+                          ),
                           onPressed: () {
                             pageController.animateToPage(
                               0,
@@ -88,19 +107,6 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: IconButton(
-              icon: Icon(Icons.settings, color: Colors.black54),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => IPSettings()),
-                );
-              },
             ),
           ),
         ],
@@ -139,9 +145,12 @@ class RegisterPage extends StatelessWidget {
     );
 
     if (err.success) {
+      err = await tms.getAuthToken(tms.userdata!);
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TaskListPage(tms)),
+        MaterialPageRoute(
+            builder: (context) => TaskListPage(tms, backgroundManager)),
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration successful')),

@@ -1,5 +1,4 @@
 import 'package:task_management_system/networking/auth.dart';
-import 'package:task_management_system/networking/dartproto/Verification.pb.dart';
 import 'package:task_management_system/networking/standards/Error.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:task_management_system/networking/standards/LoginRequest.dart';
@@ -30,14 +29,11 @@ class TaskManagementSystem {
       try {
         targetIP = await _resolveIPAddress("diarmuidmalanaphy.co.uk");
       } catch (e) {
-        // If DNS resolution fails, default to 0.0.0.0
-        print('Failed to resolve IP address: $e');
         targetIP = "0.0.0.0";
       }
     } else {
       targetIP = grabbedIP;
     }
-    print('Resolved IP: $targetIP');
   }
 
   Future<String> _resolveIPAddress(String hostname) async {
@@ -139,6 +135,24 @@ class TaskManagementSystem {
       return ReturnError(false, "No token");
     }
     var networkRequest = serialiseRequest(7, request.serialise);
+    Request_Type reply =
+        await handleSingleTCPExchange(networkRequest, targetIP, 5050);
+    return logError(reply);
+  }
+
+  Future<ReturnError> deleteAccount() async {
+    var token = await _auth.getVerificationToken();
+    if (token == null) {
+      ReturnError err = await getAuthToken(_auth.getInitialVerification()!);
+      if (err.success == false) {
+        return err;
+      }
+      token = _auth.getVerificationToken();
+    }
+    if (token == null) {
+      return ReturnError(false, "No token");
+    }
+    var networkRequest = serialiseRequest(3, token.serialise);
     Request_Type reply =
         await handleSingleTCPExchange(networkRequest, targetIP, 5050);
     return logError(reply);
