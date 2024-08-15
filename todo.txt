@@ -1,11 +1,5 @@
-Necessary
 	Add Date added
-	Add Pictures
-	Revamp taskDesc
-	Make it default to diarmuidmalanaphy.co.uk
 	trim the Description (remove excess bytes)
-+
 	Add unique filters for a user
-	
 	Add DarkMode
 

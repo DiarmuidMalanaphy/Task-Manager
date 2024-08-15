@@ -13,7 +13,7 @@ const (
 	RequestTypeVerifyUserExists = uint8(4)
 	RequestTypeUpdateUser       = uint8(5)
 	RequestTypeGenerateToken    = uint8(6)
-	RequestTypeVerifyToken = uint8(7)
+	RequestTypeVerifyToken      = uint8(7)
 
 	RequestTypePollUser       = uint8(15)
 	RequestTypeAddTask        = uint8(16)
@@ -195,7 +195,19 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		networktool.SendTCPReply(data.Conn, outgoing_req)
 		return
 
+	case RequestTypeVerifyToken:
+		t, err := VerificationToken_FromProto(data.Request.Payload)
 
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if !user_map.VerifyToken(t.Verification) {
+			generate_and_send_error("Incorrect Username or Password", data)
+			return
+		}
+		generate_and_send_success(data)
 
 	case RequestTypeAddTask:
 		fmt.Println("Add Task")
@@ -213,7 +225,7 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			return
 		}
 		target_user, ok := user_map.Value(r.NewTask.TargetUsername.toString())
-		
+
 		fmt.Printf("Stringified target username: %s\n", r.NewTask.TargetUsername.toString())
 		if ok == true {
 			fmt.Println("nope")

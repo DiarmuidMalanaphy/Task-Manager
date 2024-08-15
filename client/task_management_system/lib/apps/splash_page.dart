@@ -23,20 +23,19 @@ class _SplashPageState extends State<SplashPage>
   @override
   void initState() {
     super.initState();
-    _auth = Auth();
-    _tms = TaskManagementSystem(_auth);
 
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 0, end: 15).animate(CurvedAnimation(
+    _animation = Tween<double>(begin: 0, end: 5).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _auth = Auth();
+      _tms = TaskManagementSystem(_auth);
+      await _tms.initializeIP();
       _checkAuthStatus();
     });
   }
@@ -62,16 +61,31 @@ class _SplashPageState extends State<SplashPage>
     try {
       Verification_Token_Type? token = _auth.getVerificationToken();
       if (token != null) {
-        print("Should verify token with server  - splashpage");
-        await Future.delayed(Duration(seconds: 2)); // Simulating network delay
-        _navigateToTaskList();
+        ReturnError err = await _tms.verifyToken();
+        if (err.success) {
+          _navigateToTaskList();
+        } else {
+          _loginWithVerification();
+        }
       } else {
         await _loginWithVerification();
       }
     } catch (e) {
       print('Error logging in with token: $e');
+      _showErrorSnackBar(context, 'An unexpected error occurred.');
       await _loginWithVerification();
     }
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior
+            .floating, // Makes the SnackBar float over the content
+        duration: Duration(seconds: 3), // Adjust the duration
+      ),
+    );
   }
 
   Future<void> _loginWithVerification() async {
@@ -80,12 +94,13 @@ class _SplashPageState extends State<SplashPage>
       Initialisation_Verification_Type? verification =
           _auth.getInitialVerification();
       if (verification != null) {
-        ReturnError success = await _tms.getAuthToken(verification);
-        if (success.success) {
+        ReturnError err = await _tms.getAuthToken(verification);
+        if (err.success) {
           await Future.delayed(
-              Duration(seconds: 2)); // Simulating network delay
+              Duration(milliseconds: 500)); // Simulating network delay
           _navigateToTaskList();
         } else {
+          _showErrorSnackBar(context, err.message);
           _showLoginOptions();
         }
       } else {
@@ -187,19 +202,21 @@ class _SplashPageState extends State<SplashPage>
               ),
             ),
           ),
-          Positioned(
-            top: 40,
-            right: 20,
-            child: IconButton(
-              icon: Icon(Icons.settings, color: Colors.black54),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => IPSettings()),
-                );
-              },
+          if (_showButtons) ...[
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: Icon(Icons.settings, color: Colors.black54),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => IPSettings()),
+                  );
+                },
+              ),
             ),
-          ),
+          ]
         ],
       ),
     );

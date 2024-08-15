@@ -273,12 +273,23 @@ class _AddTaskPageState extends State<AddTaskPage>
     if (_formKey.currentState!.validate()) {
       var filterOne = _combineFilters();
       var filterTwo = 0;
+      if ((filterTwo + filterOne) == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("There must be atleast one filter applied")),
+        );
+        return;
+      }
+
       var username = await widget.tms.username;
+
+      String targetUsername = (_targetUsernameController.text == "")
+          ? username.toString()
+          : _targetUsernameController.text;
       ReturnError success = await widget.tms.addTask(
         _taskNameController.text,
         _descriptionController.text,
-        _targetUsernameController.text,
         username.toString(),
+        targetUsername,
         filterOne,
         filterTwo,
       );

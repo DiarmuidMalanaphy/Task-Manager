@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Task Management System',
+      title: 'Diarmuids GTD App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,

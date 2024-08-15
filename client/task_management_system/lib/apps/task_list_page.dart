@@ -20,7 +20,7 @@ class _TaskListPageState extends State<TaskListPage> {
   ScrollController _scrollController = ScrollController();
   Set<int> _selectedTasks = {};
   bool _isHovering = false;
-  bool _showCompletedTasks = true;
+  bool _showCompletedTasks = false;
 
   @override
   void initState() {
@@ -75,8 +75,8 @@ class _TaskListPageState extends State<TaskListPage> {
     // This is a placeholder for the actual implementation
     print('Completing selected tasks: $_selectedTasks');
     // for (int taskId in _selectedTasks) {
-    //   await widget.tms.completeTask(taskId);
-    // }
+    //  await widget.tms.completeTask(taskId);
+    //}
     _selectedTasks.clear();
     _refreshTasks();
   }
@@ -249,7 +249,7 @@ class _TaskListPageState extends State<TaskListPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Customize your app experience',
+                  'Username : ${widget.tms.username!.toString()}',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
