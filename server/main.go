@@ -73,7 +73,6 @@ func main() {
 
 func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 
-	fmt.Printf("Received Request-Type: %d\n", data.Request.Type)
 
 	switch data.Request.Type {
 	case RequestTypePollAlive:
@@ -143,7 +142,6 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			return
 		}
 
-		fmt.Println(t.Verification.Token)
 		if !user_map.VerifyToken(t.Verification) {
 			generate_and_send_error("Incorrect Username or Password", data)
 			return
@@ -198,7 +196,6 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 
 
 	case RequestTypeAddTask:
-		fmt.Println("Add Task")
 		r, err := AddTaskRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
@@ -212,15 +209,12 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			generate_and_send_error("Recipient username isn't registered", data)
 			return
 		}
-		target_user, ok := user_map.Value(r.NewTask.TargetUsername.toString())
+		target_user, _ := user_map.Value(r.NewTask.TargetUsername.toString())
 		
-		fmt.Printf("Stringified target username: %s\n", r.NewTask.TargetUsername.toString())
-		if ok == true {
-			fmt.Println("nope")
-		}
 
 		r.NewTask.TaskID = target_user.IncrementTaskID()
 		err = target_user.AddTask(r.NewTask)
+
 		if err != nil {
 			fmt.Println(err)
 			generate_and_send_error("Error storing the task", data)
@@ -269,7 +263,6 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 		return
 
 	case RequestTypeFlipTaskState:
-		fmt.Println("flipping")
 		r, err := RemoveTaskRequest_FromProto(data.Request.Payload)
 		if err != nil {
 			fmt.Println(err)
