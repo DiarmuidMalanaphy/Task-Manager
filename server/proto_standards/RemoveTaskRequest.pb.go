@@ -7,6 +7,7 @@
 package standards
 
 import (
+	proto_standards "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -25,8 +26,8 @@ type RemoveTaskRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Token  *VerificationToken `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	TaskID uint64             `protobuf:"varint,2,opt,name=TaskID,proto3" json:"TaskID,omitempty"`
+	Token  *proto_standards.VerificationToken `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	TaskID uint64                             `protobuf:"varint,2,opt,name=TaskID,proto3" json:"TaskID,omitempty"`
 }
 
 func (x *RemoveTaskRequest) Reset() {
@@ -61,7 +62,7 @@ func (*RemoveTaskRequest) Descriptor() ([]byte, []int) {
 	return file_RemoveTaskRequest_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RemoveTaskRequest) GetToken() *VerificationToken {
+func (x *RemoveTaskRequest) GetToken() *proto_standards.VerificationToken {
 	if x != nil {
 		return x.Token
 	}
@@ -109,8 +110,8 @@ func file_RemoveTaskRequest_proto_rawDescGZIP() []byte {
 
 var file_RemoveTaskRequest_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_RemoveTaskRequest_proto_goTypes = []any{
-	(*RemoveTaskRequest)(nil), // 0: taskmanager.pb.RemoveTaskRequest
-	(*VerificationToken)(nil), // 1: taskmanager.pb.VerificationToken
+	(*RemoveTaskRequest)(nil),                 // 0: taskmanager.pb.RemoveTaskRequest
+	(*proto_standards.VerificationToken)(nil), // 1: taskmanager.pb.VerificationToken
 }
 var file_RemoveTaskRequest_proto_depIdxs = []int32{
 	1, // 0: taskmanager.pb.RemoveTaskRequest.token:type_name -> taskmanager.pb.VerificationToken
@@ -126,7 +127,6 @@ func file_RemoveTaskRequest_proto_init() {
 	if File_RemoveTaskRequest_proto != nil {
 		return
 	}
-	file_Verification_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_RemoveTaskRequest_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*RemoveTaskRequest); i {
