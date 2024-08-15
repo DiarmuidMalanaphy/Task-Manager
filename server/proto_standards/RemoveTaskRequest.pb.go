@@ -4,10 +4,9 @@
 // 	protoc        v3.21.12
 // source: RemoveTaskRequest.proto
 
-package standards
+package proto_standards
 
 import (
-	proto_standards "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -26,8 +25,8 @@ type RemoveTaskRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Token  *proto_standards.VerificationToken `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	TaskID uint64                             `protobuf:"varint,2,opt,name=TaskID,proto3" json:"TaskID,omitempty"`
+	Token  *VerificationToken `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	TaskID uint64             `protobuf:"varint,2,opt,name=TaskID,proto3" json:"TaskID,omitempty"`
 }
 
 func (x *RemoveTaskRequest) Reset() {
@@ -62,7 +61,7 @@ func (*RemoveTaskRequest) Descriptor() ([]byte, []int) {
 	return file_RemoveTaskRequest_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RemoveTaskRequest) GetToken() *proto_standards.VerificationToken {
+func (x *RemoveTaskRequest) GetToken() *VerificationToken {
 	if x != nil {
 		return x.Token
 	}
@@ -89,11 +88,11 @@ var file_RemoveTaskRequest_proto_rawDesc = []byte{
 	0x70, 0x62, 0x2e, 0x56, 0x65, 0x72, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54,
 	0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x16, 0x0a, 0x06, 0x54,
 	0x61, 0x73, 0x6b, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x54, 0x61, 0x73,
-	0x6b, 0x49, 0x44, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6b, 0x49, 0x44, 0x42, 0x42, 0x5a, 0x40, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
 	0x6d, 0x2f, 0x44, 0x69, 0x61, 0x72, 0x6d, 0x75, 0x69, 0x64, 0x4d, 0x61, 0x6c, 0x61, 0x6e, 0x61,
 	0x70, 0x68, 0x79, 0x2f, 0x54, 0x61, 0x73, 0x6b, 0x2d, 0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72,
-	0x2f, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x2f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x5f, 0x73, 0x74,
+	0x61, 0x6e, 0x64, 0x61, 0x72, 0x64, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -110,8 +109,8 @@ func file_RemoveTaskRequest_proto_rawDescGZIP() []byte {
 
 var file_RemoveTaskRequest_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_RemoveTaskRequest_proto_goTypes = []any{
-	(*RemoveTaskRequest)(nil),                 // 0: taskmanager.pb.RemoveTaskRequest
-	(*proto_standards.VerificationToken)(nil), // 1: taskmanager.pb.VerificationToken
+	(*RemoveTaskRequest)(nil), // 0: taskmanager.pb.RemoveTaskRequest
+	(*VerificationToken)(nil), // 1: taskmanager.pb.VerificationToken
 }
 var file_RemoveTaskRequest_proto_depIdxs = []int32{
 	1, // 0: taskmanager.pb.RemoveTaskRequest.token:type_name -> taskmanager.pb.VerificationToken
@@ -127,6 +126,7 @@ func file_RemoveTaskRequest_proto_init() {
 	if File_RemoveTaskRequest_proto != nil {
 		return
 	}
+	file_Verification_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_RemoveTaskRequest_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*RemoveTaskRequest); i {
