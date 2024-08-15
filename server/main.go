@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
 	networktool "github.com/DiarmuidMalanaphy/networktools"
 )
 
@@ -72,7 +72,6 @@ func main() {
 // Return a success or failure
 
 func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
-
 
 	switch data.Request.Type {
 	case RequestTypePollAlive:
@@ -200,7 +199,6 @@ func handle_TCP_requests(data networktool.TCPNetworkData, user_map *UserMap) {
 			fmt.Println(err)
 			return
 		}
-
 
 		if !user_map.VerifyToken(t) {
 			generate_and_send_error("Incorrect Username or Password", data)

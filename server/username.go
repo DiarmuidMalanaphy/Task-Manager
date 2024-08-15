@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
 )
 
 type Username [20]byte

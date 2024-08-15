@@ -4,10 +4,9 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
-	"time"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
 	"google.golang.org/protobuf/proto"
-
+	"time"
 )
 
 type InitialVerification struct {
@@ -78,6 +77,5 @@ func VerificationToken_FromBytes(data []byte) (VerificationToken, error) {
 		return VerificationToken{}, err
 	}
 	return token, nil
-
 
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
 	"golang.org/x/crypto/bcrypt"
 )
 
