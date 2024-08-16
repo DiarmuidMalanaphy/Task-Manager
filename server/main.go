@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 	networktool "github.com/DiarmuidMalanaphy/networktools"
 )
 

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 )
 
 type Uint128 struct {

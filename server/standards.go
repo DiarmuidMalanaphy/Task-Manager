@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/gob"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 	"google.golang.org/protobuf/proto"
 )
 

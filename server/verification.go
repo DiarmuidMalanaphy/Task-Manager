@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	pb "github.com/DiarmuidMalanaphy/Task-Manager/proto_standards"
+	pb "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 	"google.golang.org/protobuf/proto"
 	"time"
 )
@@ -48,7 +48,7 @@ func NewVerificationToken(userID uint64) (VerificationToken, error) {
 
 func (v VerificationToken) ToProto() *pb.VerificationToken {
 	return &pb.VerificationToken{
-		Token:   hex.EncodeToString(v.Token[:]),
+		Token:   []byte(hex.EncodeToString(v.Token[:])),
 		UserID:  v.UserID,
 		Expires: v.Expires,
 	}
@@ -56,7 +56,7 @@ func (v VerificationToken) ToProto() *pb.VerificationToken {
 
 func VerificationToken_FromProto(token *pb.VerificationToken) (VerificationToken, error) {
 	var vt VerificationToken
-	tokenBytes, err := hex.DecodeString(token.Token)
+	tokenBytes, err := hex.DecodeString(string(token.Token))
 	if err != nil {
 		return VerificationToken{}, err
 	}
