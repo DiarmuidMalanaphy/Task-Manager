@@ -13,9 +13,7 @@ class BackgroundManager {
 
   void updateBackground() {
     if (personalConfigManager.getMonkey() == true) {
-      _background = MonkeyModeBackground(
-        animationValue: 1,
-      );
+      _background = MonkeyModeBackground();
     } else if (personalConfigManager.getAnimated() == true) {
       _background = AnimatedBackground(
         isDarkMode: personalConfigManager.getDarkModeConfig(),

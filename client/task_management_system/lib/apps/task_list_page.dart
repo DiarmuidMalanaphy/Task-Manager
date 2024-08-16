@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_management_system/apps/background_manager.dart';
+import 'package:task_management_system/apps/settings_sidebar.dart';
 import 'package:task_management_system/apps/splash_page.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
@@ -63,9 +64,8 @@ class TaskListPageState extends State<TaskListPage> {
         _applyFilters();
       });
     } catch (e) {
-      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
             content:
                 Text('Failed to load tasks', style: TextStyle(fontSize: 16))),
       );
@@ -123,6 +123,12 @@ class TaskListPageState extends State<TaskListPage> {
     });
   }
 
+  void _onSettingsChanged() {
+    setState(() {
+      // This will trigger a rebuild of the parent widget
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Splitting tasks into pending and completed
@@ -132,7 +138,12 @@ class TaskListPageState extends State<TaskListPage> {
         _filteredTasks.where((task) => task.status == 1).toList();
 
     return Scaffold(
-      endDrawer: _buildSettingsSidebar(), // Ensure this method is defined
+      endDrawer: SettingsSidebar(
+        bm: widget.bm,
+        logout: _logout,
+        deleteAccount: _confirmDeleteAccount,
+        onSettingsChanged: _onSettingsChanged,
+      ),
       body: Stack(
         children: [
           widget.bm.background,
@@ -149,7 +160,7 @@ class TaskListPageState extends State<TaskListPage> {
                         controller: _scrollController,
                         thumbVisibility: true,
                         child: ListView(
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           controller: _scrollController,
                           children: [
                             _buildTaskList(pendingTasks, "Pending Tasks",
@@ -183,20 +194,20 @@ class TaskListPageState extends State<TaskListPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             'Tasks',
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.check_circle, color: Colors.green),
+                icon: const Icon(Icons.check_circle, color: Colors.green),
                 onPressed:
                     _selectedTasks.isNotEmpty ? _deselectAll : _selectAll,
               ),
               Builder(
                 builder: (context) => IconButton(
-                  icon: Icon(Icons.menu, color: Colors.black87),
+                  icon: const Icon(Icons.menu, color: Colors.black87),
                   onPressed: () => Scaffold.of(context).openEndDrawer(),
                 ),
               ),
@@ -213,7 +224,7 @@ class TaskListPageState extends State<TaskListPage> {
       return SizedBox.shrink();
     }
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(15),
@@ -221,7 +232,7 @@ class TaskListPageState extends State<TaskListPage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -244,7 +255,7 @@ class TaskListPageState extends State<TaskListPage> {
           else
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 final task = tasks[index];
@@ -263,7 +274,7 @@ class TaskListPageState extends State<TaskListPage> {
                   onDelete: () async {
                     bool success = false;
                     ReturnError err;
-                    if (_selectedTasks.length < 1) {
+                    if (_selectedTasks.isNotEmpty) {
                       err = await (widget.tms.removeTask(task.taskID.toInt()));
                       success = err.success;
                     } else {
@@ -273,7 +284,7 @@ class TaskListPageState extends State<TaskListPage> {
                     _refreshTasks();
                     if (!success) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                             content: Text('Failed to remove task',
                                 style: TextStyle(fontSize: 16))),
                       );
@@ -292,112 +303,23 @@ class TaskListPageState extends State<TaskListPage> {
     );
   }
 
-  Widget _buildSettingsSidebar() {
-    return Drawer(
-      child: Container(
-        constraints: BoxConstraints.expand(),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue[50]!, Colors.purple[50]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildUserHeader(),
-                SwitchListTile(
-                  title: Text('Show Completed Tasks'),
-                  subtitle: Text('Display or hide completed tasks in the list'),
-                  value: _showCompletedTasks,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _showCompletedTasks = value;
-                    });
-                  },
-                ),
-                Divider(),
-                SwitchListTile(
-                  title: Text('Dark Mode'),
-                  subtitle: Text('Switch between dark and light mode'),
-                  value: widget.bm.darkMode,
-                  onChanged: (bool value) {
-                    setState(() {
-                      widget.bm.personalConfigManager.flipDarkModeConfig();
-                      widget.bm.updateBackground();
-                    });
-                  },
-                ),
-                Divider(),
-                SwitchListTile(
-                  title: Text('Animated Background'),
-                  subtitle: Text('Enable or disable animated background'),
-                  value: widget.bm.animated,
-                  onChanged: (bool value) {
-                    setState(() {
-                      widget.bm.personalConfigManager.flipAnimated();
-                      widget.bm.updateBackground();
-                    });
-                  },
-                ),
-                Divider(),
-                SwitchListTile(
-                  title: Text('Monkey Mode'),
-                  subtitle: Text('Enable or disable monkey mode background'),
-                  value: widget.bm.monkeyMode,
-                  onChanged: (bool value) {
-                    setState(() {
-                      widget.bm.personalConfigManager.flipMonkey();
-                      widget.bm.updateBackground();
-                    });
-                  },
-                ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.logout, color: Colors.red),
-                  title: Text('Logout', style: TextStyle(color: Colors.red)),
-                  onTap: () {
-                    Navigator.pop(context); // Close the drawer
-                    _logout();
-                  },
-                ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.delete_forever, color: Colors.red),
-                  title: Text('Delete Account',
-                      style: TextStyle(color: Colors.red)),
-                  onTap: () {
-                    _confirmDeleteAccount();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   void _confirmDeleteAccount() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete Account'),
-          content: Text(
+          title: const Text('Delete Account'),
+          content: const Text(
               'Are you sure you want to delete your account? This action cannot be undone.'),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child: const Text('Delete'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 widget.tms.deleteAccount();
@@ -410,51 +332,9 @@ class TaskListPageState extends State<TaskListPage> {
     );
   }
 
-  Widget _buildUserHeader() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue[400]!, Colors.purple[400]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.white,
-            child: Text(
-              widget.tms.username!.toString()[0].toUpperCase(),
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Welcome,',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 18,
-            ),
-          ),
-          Text(
-            widget.tms.username!.toString(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildEmptyTaskIndicator() {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -464,7 +344,7 @@ class TaskListPageState extends State<TaskListPage> {
               size: 50,
               color: Colors.grey[600],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "No tasks yet",
               style: TextStyle(
@@ -473,7 +353,7 @@ class TaskListPageState extends State<TaskListPage> {
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               "Tap the + button to create a new task",
               style: TextStyle(
@@ -492,7 +372,7 @@ class TaskListPageState extends State<TaskListPage> {
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         width: _isHovering ? 90 : 60,
         height: _isHovering ? 90 : 60,
         child: FloatingActionButton(

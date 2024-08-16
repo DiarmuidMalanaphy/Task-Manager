@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'apps/splash_page.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  await Hive.openBox('auth_box');
-  await Hive.openBox('config_box');
+  final directory = await getApplicationDocumentsDirectory();
+  final path = directory.path;
+  await Hive.initFlutter(path);
+  await Hive.openBox('gtd_box');
 
   runApp(MyApp());
 }
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
-        inputDecorationTheme: InputDecorationTheme(
+        inputDecorationTheme: const InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
           contentPadding:

@@ -26,19 +26,6 @@ class LoginPage extends StatelessWidget {
         children: [
           backgroundManager.background,
           Container(
-            //  decoration: BoxDecoration(
-//              gradient: LinearGradient(
-//                begin: Alignment.topLeft,
-//                end: Alignment.bottomRight,
-//               colors: [
-//                  Colors.blue[100]!,
-//                  Colors.blue[300]!,
-//                  Colors.purple[100]!,
-//                  Colors.purple[300]!,
-//                ],
-//                stops: [0.0, 0.4, 0.7, 1.0],
-//              ),
-            //),
             child: Column(
               children: [
                 AppBar(
@@ -55,7 +42,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -67,7 +54,7 @@ class LoginPage extends StatelessWidget {
                             fillColor: Colors.white.withOpacity(0.7),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         TextField(
                           controller: _passwordController,
                           decoration: InputDecoration(
@@ -77,19 +64,20 @@ class LoginPage extends StatelessWidget {
                           ),
                           obscureText: true,
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 vertical: 12.0, horizontal: 24.0),
                           ),
-                          child: Text('Login', style: TextStyle(fontSize: 18)),
+                          child: const Text('Login',
+                              style: TextStyle(fontSize: 18)),
                           onPressed: () => _login(context),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         TextButton(
                           child: Text(
                             'Don\'t have an account? Swipe left to Register',
@@ -101,7 +89,7 @@ class LoginPage extends StatelessWidget {
                           onPressed: () {
                             pageController.animateToPage(
                               1,
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
                           },

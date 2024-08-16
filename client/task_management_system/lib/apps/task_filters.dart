@@ -53,18 +53,18 @@ class TaskFiltersState extends State<TaskFilters> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Filter Settings',
+                  const Text('Filter Settings',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
-                      Text('Logic: '),
+                      const Text('Logic: '),
                       DropdownButton<FilterLogic>(
                         value: _filterLogic,
                         onChanged: (FilterLogic? newValue) {
@@ -86,7 +86,7 @@ class TaskFiltersState extends State<TaskFilters> {
                   ),
                   Row(
                     children: [
-                      Text('Inclusion: '),
+                      const Text('Inclusion: '),
                       DropdownButton<FilterInclusion>(
                         value: _filterInclusion,
                         onChanged: (FilterInclusion? newValue) {
@@ -110,7 +110,7 @@ class TaskFiltersState extends State<TaskFilters> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Case Sensitive: '),
+                      const Text('Case Sensitive: '),
                       Switch(
                         value: _caseSensitive,
                         onChanged: (bool value) {
@@ -139,9 +139,9 @@ class TaskFiltersState extends State<TaskFilters> {
         children: [
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Search tasks...',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
@@ -160,9 +160,10 @@ class TaskFiltersState extends State<TaskFilters> {
               itemBuilder: (context, index) {
                 final filterName = FilterConstants.filterNames[index];
                 return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: FilterChip(
-                    label: Text(filterName, style: TextStyle(fontSize: 16)),
+                    label:
+                        Text(filterName, style: const TextStyle(fontSize: 16)),
                     selected: _selectedFilters.contains(index),
                     onSelected: (selected) {
                       setState(() {

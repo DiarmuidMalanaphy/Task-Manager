@@ -50,26 +50,20 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
           //// Foreground content
           Container(
-            //  decoration: BoxDecoration(
-            //    gradient: LinearGradient(
-            //      colors: [Colors.blue[100]!, Colors.purple[100]!],
-            //      begin: Alignment.topCenter,
-            //      end: Alignment.bottomCenter,
-            //    ),
             //  ),
             child: SafeArea(
               child: Form(
                 key: _formKey,
                 child: ListView(
-                  padding: EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24.0),
                   children: [
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     _buildInputField(_taskNameController, 'Task Name'),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     _buildInputField(_descriptionController, 'Task Description',
                         maxLines: 3),
-                    SizedBox(height: 24),
-                    Text(
+                    const SizedBox(height: 24),
+                    const Text(
                       'Filters:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -77,16 +71,16 @@ class _AddTaskPageState extends State<AddTaskPage> {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     _buildFilterChips(),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     _buildAddToOtherUserCheckbox(),
                     if (_isAddingToOtherUser) ...[
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       _buildInputField(
                           _targetUsernameController, 'Target Username'),
                     ],
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -94,11 +88,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
                         elevation: 5,
                       ),
                       onPressed: _submitForm,
-                      child: Text(
+                      child: const Text(
                         'Add Task',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
@@ -124,7 +118,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -183,7 +177,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: CheckboxListTile(
-        title: Text('Add task to another user'),
+        title: const Text('Add task to another user'),
         value: _isAddingToOtherUser,
         onChanged: (bool? value) {
           setState(() {
@@ -267,7 +261,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
       if (success.success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Task added successfully')),
+          const SnackBar(content: Text('Task added successfully')),
         );
         Navigator.pop(context, true);
       } else {

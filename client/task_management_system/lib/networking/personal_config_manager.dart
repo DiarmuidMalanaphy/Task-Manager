@@ -1,7 +1,8 @@
 import 'package:hive/hive.dart';
 
 class PersonalConfigManager {
-  static const String _boxName = 'config_box';
+  static const String _boxName = 'gtd_box';
+  static const String _configBoxName = "config_box";
   static const String _darkModeKey = 'dark_mode';
   static const String _showCompletedTasksKey = 'completed_tasks';
   static const String _animatedKey = 'animated?';
@@ -11,24 +12,40 @@ class PersonalConfigManager {
     _box = Hive.box(_boxName);
   }
 
+  String get darkModeKey {
+    return _configBoxName + _darkModeKey;
+  }
+
+  String get showCompletedTasksKey {
+    return _configBoxName + _showCompletedTasksKey;
+  }
+
+  String get animatedKey {
+    return _configBoxName + _animatedKey;
+  }
+
+  String get monkeyKey {
+    return _configBoxName + _monkeyKey;
+  }
+
   void storeDarkModeConfig(bool darkModeConfig) {
-    _box.put(_darkModeKey, darkModeConfig);
+    _box.put(darkModeKey, darkModeConfig);
   }
 
   void storeShowCompletedTasks(bool completedTasksConfig) {
-    _box.put(_showCompletedTasksKey, completedTasksConfig);
+    _box.put(showCompletedTasksKey, completedTasksConfig);
   }
 
   void storeAnimated(bool animatedConfig) {
-    _box.put(_animatedKey, animatedConfig);
+    _box.put(animatedKey, animatedConfig);
   }
 
   void storeMonkey(bool monkeyConfig) {
-    _box.put(_monkeyKey, monkeyConfig);
+    _box.put(monkeyKey, monkeyConfig);
   }
 
   bool getDarkModeConfig() {
-    final bool? data = _box.get(_darkModeKey) as bool?;
+    final bool? data = _box.get(darkModeKey) as bool?;
     if (data != null) {
       return data;
     }
@@ -37,7 +54,7 @@ class PersonalConfigManager {
   }
 
   bool getShowCompletedTasksConfig() {
-    final bool? data = _box.get(_showCompletedTasksKey) as bool?;
+    final bool? data = _box.get(showCompletedTasksKey) as bool?;
     if (data != null) {
       return data;
     }
@@ -46,7 +63,7 @@ class PersonalConfigManager {
   }
 
   bool getAnimated() {
-    final bool? data = _box.get(_animatedKey) as bool?;
+    final bool? data = _box.get(animatedKey) as bool?;
     if (data != null) {
       return data;
     }
@@ -55,7 +72,7 @@ class PersonalConfigManager {
   }
 
   bool getMonkey() {
-    final bool? data = _box.get(_monkeyKey) as bool?;
+    final bool? data = _box.get(monkeyKey) as bool?;
     if (data != null) {
       return data;
     }

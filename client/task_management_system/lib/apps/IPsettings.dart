@@ -61,15 +61,16 @@ class _IPSettingsState extends State<IPSettings> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.arrow_back, color: Colors.black54),
+                        icon:
+                            const Icon(Icons.arrow_back, color: Colors.black54),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      Text(
+                      const Text(
                         'IP Settings',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(width: 48), // To balance the layout
+                      const SizedBox(width: 48), // To balance the layout
                     ],
                   ),
                 ),
@@ -94,16 +95,17 @@ class _IPSettingsState extends State<IPSettings> {
                             ),
                             keyboardType: TextInputType.number,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   vertical: 12.0, horizontal: 24.0),
                             ),
-                            child: Text('Save', style: TextStyle(fontSize: 18)),
+                            child: const Text('Save',
+                                style: TextStyle(fontSize: 18)),
                             onPressed: _verifyAndSaveIP,
                           ),
                         ],

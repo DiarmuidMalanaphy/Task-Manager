@@ -50,7 +50,6 @@ class DarkModeBackgroundPainter extends CustomPainter {
   final double animationValue;
   final List<Star> stars = [];
   final List<Planet> planets = [];
-  final List<Comet> comets = [];
   final Random random = Random();
 
   double timeSinceLastComet = 0.0;
@@ -113,7 +112,6 @@ class DarkModeBackgroundPainter extends CustomPainter {
 
     // Draw solar system with 3D effect planets
     drawSolarSystem(canvas, size);
-    _updateAndDrawComets(canvas, size);
   }
 
   void drawSolarSystem(Canvas canvas, Size size) {
@@ -161,102 +159,25 @@ class DarkModeBackgroundPainter extends CustomPainter {
     }
   }
 
-  Comet _createRandomComet(Size size) {
-    final startSide = random.nextInt(4); // 0: top, 1: right, 2: bottom, 3: left
-    late Offset start;
-    late Offset end;
-
-    switch (startSide) {
-      case 0: // top
-        start = Offset(random.nextDouble() * size.width, -50);
-        end = Offset(random.nextDouble() * size.width, size.height + 50);
-        break;
-      case 1: // right
-        start = Offset(size.width + 50, random.nextDouble() * size.height);
-        end = Offset(-50, random.nextDouble() * size.height);
-        break;
-      case 2: // bottom
-        start = Offset(random.nextDouble() * size.width, size.height + 50);
-        end = Offset(random.nextDouble() * size.width, -50);
-        break;
-      case 3: // left
-        start = Offset(-50, random.nextDouble() * size.height);
-        end = Offset(size.width + 50, random.nextDouble() * size.height);
-        break;
-    }
-
-    return Comet(
-      start: start,
-      end: end,
-      speed: 0.005 + random.nextDouble() * 0.015,
-      thickness: 1.0 + random.nextDouble() * 2.0,
-    );
-  }
-
-  void _updateAndDrawComets(Canvas canvas, Size size) {
-    // Update time and potentially add new comet
-    timeSinceLastComet += 1;
-    if (timeSinceLastComet >=
-        cometInterval +
-            random.nextDouble() * cometIntervalVariance * 2 -
-            cometIntervalVariance) {
-      comets.add(_createRandomComet(size));
-      timeSinceLastComet = 0.0;
-    }
-
-    // Update and draw existing comets
-    comets.removeWhere((comet) {
-      final isActive = comet.update(0.016);
-      if (isActive) {
-        _drawComet(canvas, comet, size);
-      }
-      return !isActive;
-    });
-  }
-
-  void _drawComet(Canvas canvas, Comet comet, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = comet.thickness
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path();
-    path.moveTo(comet.start.dx, comet.start.dy);
-    path.lineTo(comet.end.dx, comet.end.dy);
-
-    final pathMetrics = path.computeMetrics().first;
-    final extractPath = pathMetrics.extractPath(
-      0.0,
-      pathMetrics.length * comet.progress,
-    );
-
-    canvas.drawPath(extractPath, paint);
+// Function to generate a noise texture shader
+  Shader createNoiseTexture(double radius) {
+    return RadialGradient(
+      colors: [
+        Colors.white.withOpacity(0.05),
+        Colors.transparent,
+      ],
+      stops: [0.5, 1.0],
+      center: Alignment(0.0, 0.0),
+      radius: 0.8,
+      tileMode: TileMode.mirror,
+    ).createShader(Rect.fromCircle(
+      center: Offset(0, 0),
+      radius: radius,
+    ));
   }
 
   @override
   bool shouldRepaint(DarkModeBackgroundPainter oldDelegate) => true;
-}
-
-class Comet {
-  Offset start;
-  Offset end;
-  double speed;
-  double progress;
-  double thickness;
-
-  Comet({
-    required this.start,
-    required this.end,
-    this.speed = 0.02,
-    this.progress = 0.0,
-    this.thickness = 2.0,
-  });
-
-  bool update(double delta) {
-    progress += speed * delta;
-    return progress <= 1.0;
-  }
 }
 
 class Star {

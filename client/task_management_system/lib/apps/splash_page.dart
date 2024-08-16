@@ -84,7 +84,7 @@ class _SplashPageState extends State<SplashPage>
         content: Text(message),
         behavior: SnackBarBehavior
             .floating, // Makes the SnackBar float over the content
-        duration: Duration(seconds: 3), // Adjust the duration
+        duration: const Duration(seconds: 3), // Adjust the duration
       ),
     );
   }
@@ -97,8 +97,6 @@ class _SplashPageState extends State<SplashPage>
       if (verification != null) {
         ReturnError err = await _tms.getAuthToken(verification);
         if (err.success) {
-          await Future.delayed(
-              Duration(milliseconds: 500)); // Simulating network delay
           _navigateToTaskList();
         } else {
           _showErrorSnackBar(context, err.message);
