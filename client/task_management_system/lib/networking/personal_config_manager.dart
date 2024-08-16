@@ -50,7 +50,7 @@ class PersonalConfigManager {
       return data;
     }
     storeDarkModeConfig(false);
-    return false; // -> Default case is not darkmode
+    return true; // -> Default case is darkmode
   }
 
   bool getShowCompletedTasksConfig() {

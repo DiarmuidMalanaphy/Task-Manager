@@ -2,6 +2,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
+
+set(APP_ICON_RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/icons/app_icon.jpg")
+configure_file(${APP_ICON_RESOURCE} ${CMAKE_BINARY_DIR}/data/app_icon.jpg COPYONLY)
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "Diarmuids_GTD_App")

@@ -274,7 +274,7 @@ class TaskListPageState extends State<TaskListPage> {
                   onDelete: () async {
                     bool success = false;
                     ReturnError err;
-                    if (_selectedTasks.isNotEmpty) {
+                    if (_selectedTasks.isEmpty) {
                       err = await (widget.tms.removeTask(task.taskID.toInt()));
                       success = err.success;
                     } else {
