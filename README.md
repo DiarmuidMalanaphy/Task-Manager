@@ -1,6 +1,6 @@
 # Diarmuid's GTD App
 
-This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. The app provides a cross-platform interface for easy access to your tasks, featuring a Golang backend for efficient server operations and Flutter for seamless mobile and desktop experiences.
+This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. The app provides a cross-platform interface for easy access to your tasks, featuring a Golang backend for efficient server operations and Flutter for seamless mobile and desktop experiences. The app leverages a cloud service allowing for always available access.
 
 ## Key Features
 
@@ -31,7 +31,7 @@ If a pre-compiled version isn't available for your system, follow these steps:
 
 ### Backend 
 
-While a globally accessible server is provided, you can set up your own local version:
+Whilst a globally accessible server is already provided, you can set up your own local version:
 
 1. Install prerequisites:
    - [Go installation guide](https://go.dev/doc/install)
