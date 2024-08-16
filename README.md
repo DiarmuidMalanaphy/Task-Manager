@@ -9,8 +9,7 @@ This application is my implementation of the Getting Things Done (GTD) method, a
 - Intuitive and user-friendly interface
 - Cross-platform support (mobile, desktop, and web)
 
-
-##Key Technologies
+## Key Technologies
 - Protocol Buffers (Protobuf) for efficient data serialization
 - Flutter for cross-platform development
 - User Tokens for secure authentication
