@@ -1,6 +1,6 @@
 # Diarmuid's GTD App
 
-This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. The app provides a cross-platform interface for easy access to your tasks. I've used a client-server model and a cloud service to give always available access.
+This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. This application uses a client server model combined with a cloud service for access anywhere across different devices.
 
 ## Key Features
 - Cloud-based for constant availability
