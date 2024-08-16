@@ -1,42 +1,51 @@
 # Diarmuid's GTD App
-GTD is a method of task management whereby you stratify tasks into what you need for completing them. This application is my implementation of that, providing a cross-platform interface for access to tasks. I've provided a Golang backend for efficient server access and flutter for mobile and desktop apps.
+
+This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. The app provides a cross-platform interface for easy access to your tasks, featuring a Golang backend for efficient server operations and Flutter for seamless mobile and desktop experiences.
 
 ## Key Features
 
-- User authentication and different profiles
-- Task creation and management
-- Simple and intuitive interface
-- Cross-platform support
+- User authentication with support for multiple profiles
+- Comprehensive task creation and management
+- Intuitive and user-friendly interface
+- Cross-platform support (mobile, desktop, and web)
 
 ## Running the Application
 
 ### Client
 
-Go into the runnables section and download the compiled version for your system and run it.
+#### Pre-compiled Versions
+Check the `runnables` section for a pre-compiled version compatible with your system. If available, download and run it directly.
 
-If you can't find anything for your version it's okay no worries.
-  1. Ensure you've got flutter installed
-     - https://radixweb.com/blog/install-flutter-on-windows-mac-and-android
-     - https://docs.flutter.dev/get-started/install/linux/android
-  2. Build for your device
-     - https://docs.codemagic.io/flutter-configuration/flutter-projects/
-  3. You should be able to run your files if you can find it in the output folders of the project.
-     - https://medium.com/@chetan.akarte/how-to-get-apk-and-ipa-files-from-flutter-af2f7af1220f
+#### Building from Source
+If a pre-compiled version isn't available for your system, follow these steps:
 
+1. Install Flutter:
+   - [Windows/Mac installation guide](https://radixweb.com/blog/install-flutter-on-windows-mac-and-android)
+   - [Linux/Android installation guide](https://docs.flutter.dev/get-started/install/linux/android)
+
+2. Build for your target device:
+   - Follow the [Codemagic guide](https://docs.codemagic.io/flutter-configuration/flutter-projects/) for your specific platform
+
+3. Locate and run the built application:
+   - Refer to this [guide on finding APK and IPA files](https://medium.com/@chetan.akarte/how-to-get-apk-and-ipa-files-from-flutter-af2f7af1220f) in your project's output folders
 
 ### Backend 
-I've provided a globally accessible server for this project, but if you want to create your own local version here's the process.
 
+While a globally accessible server is provided, you can set up your own local version:
 
-1. Make sure you have Go and Git installed on your system.
-   - https://go.dev/doc/install
-   - https://github.com/git-guides/install-git
+1. Install prerequisites:
+   - [Go installation guide](https://go.dev/doc/install)
+   - [Git installation guide](https://github.com/git-guides/install-git).
+  
 2. Clone the Repository
-   - git clone https://github.com/DiarmuidMalanaphy/Task-Manager
+   - ```bash
+     git clone https://github.com/DiarmuidMalanaphy/Task-Manager
 3. Navigate to the server directory.
-   - cd Task-Manager/server
+   - ```bash
+     cd Task-Manager/server
 4. Run the Go-Server
-   - go run .
+   - ```bash
+     go run .
 
 The program should run and show you your public and local IP addresses. You can connect over either of these. If you want to use the global IP address over the internet you will have to open your ports. 
 
