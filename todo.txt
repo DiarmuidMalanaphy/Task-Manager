@@ -1,5 +1,0 @@
-	Add Date added
-	trim the Description (remove excess bytes)
-	Add unique filters for a user
-	Add DarkMode
-
