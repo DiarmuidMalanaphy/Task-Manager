@@ -1,4 +1,4 @@
-module proto_standards
+module github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards
 
 go 1.19
 
