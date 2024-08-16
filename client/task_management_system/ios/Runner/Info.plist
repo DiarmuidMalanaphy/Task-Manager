@@ -3,15 +3,16 @@
 <plist version="1.0">
 	<dict>
 
-	<key>NSAppTransportSecurity</key>
-	<dict>
-	  <key>NSAllowsArbitraryLoads</key>
-	  <true/>
-	</dict>
+		
+		<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Task Management System</string>
+	<string>Diarmuid's GTD System</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
