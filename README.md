@@ -63,5 +63,8 @@ The program should run and show you your public and local IP addresses. You can 
 
 If you want the application to connect to your server over mine you will have to modify the IP setting in the splash page of the app.
 ![OnPaste 20240816-023416](https://github.com/user-attachments/assets/323f479a-d0bb-4722-8c97-732233ca8a0c)
+You can then just type the address you want to connect to in the text section and it should automatically connect to your server.
+![image](https://github.com/user-attachments/assets/a26f61b8-4dda-4dae-8750-29ff0b4ee447)
+
 
 
