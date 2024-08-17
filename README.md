@@ -1,9 +1,14 @@
 # Diarmuid's GTD App
 
 This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. This application employs a client server model combined with a cloud service for access anywhere across different devices.
+| ![Image 1](https://github.com/user-attachments/assets/6e0c2507-7381-4475-a968-4f5fdaa2da37) | ![Image 2](https://github.com/user-attachments/assets/d8ceb144-fd29-4e37-a0ba-2ad425e12381) |
+|:---:|:---:|
+| **Splash Page** | **Task list page** |
 
-![image](https://github.com/user-attachments/assets/6e0c2507-7381-4475-a968-4f5fdaa2da37)
-![image](https://github.com/user-attachments/assets/d8ceb144-fd29-4e37-a0ba-2ad425e12381)
+**There are different, animated themes available**
+
+
+
 
 
 
