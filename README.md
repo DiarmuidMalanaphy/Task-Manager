@@ -1,13 +1,27 @@
 # Diarmuid's GTD App
 
 This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. This application employs a client server model combined with a cloud service for access anywhere across different devices.
+
+
+**There are different, animated background themes available, I've varied them in the demo:**
 | ![Image 1](https://github.com/user-attachments/assets/6e0c2507-7381-4475-a968-4f5fdaa2da37) | ![Image 2](https://github.com/user-attachments/assets/d8ceb144-fd29-4e37-a0ba-2ad425e12381) |
 |:---:|:---:|
-| **Splash Page** | **Task list page** |
-
-**There are different, animated themes available**
+| **Splash Page** | **Empty Task List Page** |
 
 
+| ![Image 3](https://github.com/user-attachments/assets/e66506b3-3436-4f96-9c1a-04d2d0b6e303) | ![Image 4](https://github.com/user-attachments/assets/74733615-85ae-4807-9d62-6a888110c2aa) |
+|:---:|:---:|
+| **With tasks** | **Adding tasks** |
+
+| ![Image 5](https://github.com/user-attachments/assets/fb3188c6-caa7-437e-8699-523c00f975d6) |
+|:---:|
+| **After applying a filter** |
+||
+-**Splash Page**: The introduction to the app.
+-**Task List Page**: Shows the default login tasks.
+-**With Tasks**: Shows the task list after adding several tasks.
+-**Adding Tasks**: Demonstrates how to add a new task.
+-**After Applying a Filter**: Highlights how the task list appears once a filter is applied.
 
 
 
