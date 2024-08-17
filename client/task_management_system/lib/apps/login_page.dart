@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_system/apps/loginTextField.dart';
 import 'package:task_management_system/networking/auth.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/standards/username.dart';
@@ -46,24 +47,11 @@ class LoginPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        TextField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            labelText: 'Username',
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.7),
-                          ),
-                        ),
+                        buildTextField(_usernameController, "Username",
+                            maxLength: 60, showCount: false),
                         const SizedBox(height: 10),
-                        TextField(
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.7),
-                          ),
-                          obscureText: true,
-                        ),
+                        buildTextField(_passwordController, "Password",
+                            maxLength: 30, showCount: false, password: true),
                         const SizedBox(height: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(

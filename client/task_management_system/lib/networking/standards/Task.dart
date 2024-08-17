@@ -5,8 +5,6 @@ import 'username.dart';
 import 'package:fixnum/fixnum.dart';
 
 class Task_Type {
-  static const int SIZE = 8 + 20 + 20 + 20 + 1 + 120 + 8 + 8; // 205 bytes total
-
   final Int64 taskID; //Uint64
   final Username_Type taskName;
   final Username_Type targetUsername;
@@ -26,13 +24,15 @@ class Task_Type {
     this.filterOne,
     this.filterTwo,
   ) {
-    if (taskName.length != 20) {
+    if (taskName.length != 50) {
+      print(taskName.length);
       throw ArgumentError('Task name must be 20 bytes');
     }
-    if (targetUsername.length != 20) {
+    if (targetUsername.length != 50) {
+      print(targetUsername.length);
       throw ArgumentError('Target username must be 20 bytes');
     }
-    if (setterUsername.length != 20) {
+    if (setterUsername.length != 50) {
       throw ArgumentError('Setter username must be 20 bytes');
     }
     if (taskDescription.length != 120) {

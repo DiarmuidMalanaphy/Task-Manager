@@ -58,10 +58,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   padding: const EdgeInsets.all(24.0),
                   children: [
                     const SizedBox(height: 30),
-                    _buildInputField(_taskNameController, 'Task Name'),
+                    _buildInputField(_taskNameController, 'Task Name',
+                        maxLength: 60),
                     const SizedBox(height: 16),
                     _buildInputField(_descriptionController, 'Task Description',
-                        maxLines: 3),
+                        maxLines: 3, maxLength: 120),
                     const SizedBox(height: 24),
                     const Text(
                       'Filters:',
@@ -78,7 +79,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     if (_isAddingToOtherUser) ...[
                       const SizedBox(height: 16),
                       _buildInputField(
-                          _targetUsernameController, 'Target Username'),
+                          _targetUsernameController, 'Target Username',
+                          maxLength: 60),
                     ],
                     const SizedBox(height: 32),
                     ElevatedButton(
@@ -109,7 +111,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   Widget _buildInputField(TextEditingController controller, String label,
-      {int maxLines = 1}) {
+      {int maxLines = 1, int? maxLength}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
@@ -132,13 +134,23 @@ class _AddTaskPageState extends State<AddTaskPage> {
           ),
           filled: true,
           fillColor: Colors.transparent,
+          counterText: '${controller.text.length}/${maxLength ?? 'unlimited'}',
         ),
         maxLines: maxLines,
+        maxLength: maxLength,
+        maxLengthEnforcement: MaxLengthEnforcement.enforced,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter $label';
           }
+          if (maxLength != null && value.length > maxLength) {
+            return '$label must be at most $maxLength characters';
+          }
           return null;
+        },
+        onChanged: (value) {
+          // This will rebuild the widget to update the character count
+          setState(() {});
         },
       ),
     );
@@ -236,6 +248,28 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      if (_taskNameController.text.length > 60) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Task name must be at most 60 characters")),
+        );
+        return;
+      }
+      if (_taskNameController.text.length > 60) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("Target username must be at most 60 characters")),
+        );
+        return;
+      }
+
+      if (_descriptionController.text.length > 120) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("Task description must be at most 120 characters")),
+        );
+        return;
+      }
+
       var filterOne = _combineFilters();
       var filterTwo = 0;
       if ((filterTwo + filterOne) == 0) {

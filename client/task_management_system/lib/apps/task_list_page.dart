@@ -36,6 +36,8 @@ class TaskListPageState extends State<TaskListPage> {
         taskListPage: this,
         onFilterApplied: _handleFilterApplied);
 
+    _showCompletedTasks =
+        widget.bm.personalConfigManager.getShowCompletedTasksConfig();
     _refreshTasks();
   }
 
@@ -125,6 +127,8 @@ class TaskListPageState extends State<TaskListPage> {
 
   void _onSettingsChanged() {
     setState(() {
+      _showCompletedTasks =
+          widget.bm.personalConfigManager.getShowCompletedTasksConfig();
       // This will trigger a rebuild of the parent widget
     });
   }
@@ -140,6 +144,7 @@ class TaskListPageState extends State<TaskListPage> {
     return Scaffold(
       endDrawer: SettingsSidebar(
         bm: widget.bm,
+        tms: widget.tms,
         logout: _logout,
         deleteAccount: _confirmDeleteAccount,
         onSettingsChanged: _onSettingsChanged,

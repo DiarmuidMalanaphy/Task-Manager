@@ -49,7 +49,7 @@ class PersonalConfigManager {
     if (data != null) {
       return data;
     }
-    storeDarkModeConfig(false);
+    storeDarkModeConfig(true);
     return true; // -> Default case is darkmode
   }
 
