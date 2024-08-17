@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:task_management_system/apps/background_manager.dart';
+import 'package:task_management_system/apps/loginTextField.dart';
 import 'package:task_management_system/networking/auth.dart';
 import 'package:task_management_system/networking/error.dart';
 import 'package:task_management_system/networking/task_management_system.dart';
@@ -64,14 +66,15 @@ class RegisterPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        _buildTextField(_usernameController, 'Username'),
+                        buildTextField(_usernameController, 'Username',
+                            maxLength: 60),
                         SizedBox(height: 10),
-                        _buildTextField(_passwordController, 'Password',
-                            isPassword: true),
+                        buildTextField(_passwordController, 'Password',
+                            password: true, maxLength: 30),
                         SizedBox(height: 10),
-                        _buildTextField(
+                        buildTextField(
                             _confirmPasswordController, 'Confirm Password',
-                            isPassword: true),
+                            password: true, maxLength: 30),
                         SizedBox(height: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -111,23 +114,6 @@ class RegisterPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      {bool isPassword = false}) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.7),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      obscureText: isPassword,
     );
   }
 

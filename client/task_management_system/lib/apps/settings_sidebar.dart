@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:task_management_system/apps/background_manager.dart';
+import 'package:task_management_system/networking/task_management_system.dart';
 
 class SettingsSidebar extends StatefulWidget {
   final BackgroundManager bm;
+  final TaskManagementSystem tms;
   final Function() logout;
   final Function() deleteAccount;
   final Function() onSettingsChanged;
@@ -10,6 +12,7 @@ class SettingsSidebar extends StatefulWidget {
   SettingsSidebar({
     Key? key,
     required this.bm,
+    required this.tms,
     required this.logout,
     required this.deleteAccount,
     required this.onSettingsChanged,
@@ -51,15 +54,20 @@ class _SettingsSidebarState extends State<SettingsSidebar> {
                 child: ListView(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   children: [
-                    _buildSectionTitle('Display'),
+                    _buildSectionTitle('Tasks Displayed'),
                     _buildSettingTile(
                       title: 'Show Completed Tasks',
                       subtitle: 'Display or hide completed tasks in the list',
-                      value: _showCompletedTasks,
+                      value: widget.bm.personalConfigManager
+                          .getShowCompletedTasksConfig(),
                       onChanged: (value) {
-                        _updateSetting(() => _showCompletedTasks = value);
+                        _updateSetting(() {
+                          widget.bm.personalConfigManager
+                              .flipShowCompletedTasksConfig();
+                        });
                       },
                     ),
+                    _buildSectionTitle('Background'),
                     _buildSettingTile(
                       title: 'Dark Mode',
                       subtitle: 'Switch between dark and light mode',
@@ -71,7 +79,6 @@ class _SettingsSidebarState extends State<SettingsSidebar> {
                         });
                       },
                     ),
-                    _buildSectionTitle('Background'),
                     _buildSettingTile(
                       title: 'Animated Background',
                       subtitle: 'Enable or disable animated background',
@@ -128,8 +135,8 @@ class _SettingsSidebarState extends State<SettingsSidebar> {
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.blue.shade300,
-            child: const Text(
-              'M',
+            child: Text(
+              widget.tms.username!.toString()[0],
               style: TextStyle(fontSize: 32, color: Colors.white),
             ),
           ),
@@ -138,8 +145,8 @@ class _SettingsSidebarState extends State<SettingsSidebar> {
             'Welcome,',
             style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
           ),
-          const Text(
-            'malanaph',
+          Text(
+            widget.tms.username!.toString(),
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ],

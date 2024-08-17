@@ -1,12 +1,9 @@
 import 'dart:typed_data';
 import 'package:task_management_system/networking/dartproto/Username.pb.dart';
 import 'package:task_management_system/networking/dartproto/Username.pbserver.dart';
-import 'package:task_management_system/networking/dartproto/Verification.pb.dart';
-import 'package:task_management_system/networking/standards/hash.dart';
-import 'package:fixnum/fixnum.dart';
 
 class Username_Type {
-  static const int LENGTH = 20;
+  static const int LENGTH = 50;
   final Uint8List _bytes;
 
   Username_Type.fromBytes(this._bytes) {
@@ -16,7 +13,7 @@ class Username_Type {
   }
 
   Username_Type.fromString(String username)
-      : _bytes = Uint8List.fromList(padRightWithZeros(username, 20)) {
+      : _bytes = Uint8List.fromList(padRightWithZeros(username, LENGTH)) {
     if (_bytes.length > LENGTH) {
       throw ArgumentError('Username must be at most $LENGTH characters');
     }
