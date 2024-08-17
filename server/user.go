@@ -12,7 +12,7 @@ type User struct {
 	mutex       sync.Mutex
 }
 
-func NewUser_FromGo(name [20]byte, hash StoredHash) User {
+func NewUser_FromGo(name [50]byte, hash StoredHash) User {
 	return User{
 		Username:    name,
 		UserID:      0,

@@ -1,6 +1,8 @@
 module github.com/DiarmuidMalanaphy/Task-Manager/server
 
-go 1.19
+go 1.21
+
+toolchain go1.22.6
 
 require (
 	github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards v0.0.0-20240816003912-95376b045fbc

@@ -6,15 +6,15 @@ import (
 	pb "github.com/DiarmuidMalanaphy/Task-Manager/server/proto_standards"
 )
 
-type Username [20]byte
+type Username [50]byte
 
 func Username_FromProto(username *pb.Username) Username {
 	var usernameByte Username
 
-	if len(username.Username) > 20 { // To mitigate buffer overflow
+	if len(username.Username) > 50 { // To mitigate buffer overflow
 		// Username is too long, truncate and log a warning
-		copy(usernameByte[:], username.Username[:20])
-		fmt.Printf("Warning: Username truncated from %d to 20 bytes\n", len(username.Username))
+		copy(usernameByte[:], username.Username[:50])
+		fmt.Printf("Warning: Username truncated from %d to 50 bytes\n", len(username.Username))
 	} else {
 		// Username fits, copy it entirely
 		copy(usernameByte[:], username.Username)
