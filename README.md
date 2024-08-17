@@ -29,6 +29,7 @@ Check the `runnables` section for a pre-compiled version compatible with your sy
 
 #### Building from Source
 If a pre-compiled version isn't available for your system, follow these steps:
+   - As of right now there is only versions available for Linux and Android due to Windows and MacOS requiring a device with their respective OS to build -> for simplicities sake you can just compile to web.
 
 1. Install Flutter:
    - [Windows/Mac installation guide](https://radixweb.com/blog/install-flutter-on-windows-mac-and-android)
