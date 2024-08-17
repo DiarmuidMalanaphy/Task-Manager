@@ -1,6 +1,30 @@
 # Diarmuid's GTD App
 
-This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. This application uses a client server model combined with a cloud service for access anywhere across different devices.
+This application is my implementation of the Getting Things Done (GTD) method, a task management system that helps you organize and prioritize tasks based on what you need to complete them. This application employs a client server model combined with a cloud service for access anywhere across different devices.
+
+
+**There are different, animated background themes available, I've varied them in the demo:**
+| ![Image 1](https://github.com/user-attachments/assets/6e0c2507-7381-4475-a968-4f5fdaa2da37) | ![Image 2](https://github.com/user-attachments/assets/d8ceb144-fd29-4e37-a0ba-2ad425e12381) |
+|:---:|:---:|
+| **Splash Page** | **Empty Task List Page** |
+
+
+| ![Image 3](https://github.com/user-attachments/assets/e66506b3-3436-4f96-9c1a-04d2d0b6e303) | ![Image 4](https://github.com/user-attachments/assets/74733615-85ae-4807-9d62-6a888110c2aa) |
+|:---:|:---:|
+| **With tasks** | **Adding tasks** |
+
+| ![Image 5](https://github.com/user-attachments/assets/fb3188c6-caa7-437e-8699-523c00f975d6) |
+|:---:|
+| **After applying a filter** |
+||
+-**Splash Page**: The introduction to the app.
+-**Task List Page**: Shows the default login tasks.
+-**With Tasks**: Shows the task list after adding several tasks.
+-**Adding Tasks**: Demonstrates how to add a new task.
+-**After Applying a Filter**: Highlights how the task list appears once a filter is applied.
+
+
+
 
 ## Key Features
 - Cloud-based for constant availability
@@ -24,6 +48,7 @@ Check the `runnables` section for a pre-compiled version compatible with your sy
 
 #### Building from Source
 If a pre-compiled version isn't available for your system, follow these steps:
+   - As of right now there is only versions available for Linux and Android due to Windows and MacOS requiring a device with their respective OS to build -> for simplicities sake you can just compile to web.
 
 1. Install Flutter:
    - [Windows/Mac installation guide](https://radixweb.com/blog/install-flutter-on-windows-mac-and-android)
@@ -57,5 +82,8 @@ The program should run and show you your public and local IP addresses. You can 
 
 If you want the application to connect to your server over mine you will have to modify the IP setting in the splash page of the app.
 ![OnPaste 20240816-023416](https://github.com/user-attachments/assets/323f479a-d0bb-4722-8c97-732233ca8a0c)
+You can then just type the address you want to connect to in the text section and it should automatically connect to your server.
+![image](https://github.com/user-attachments/assets/a26f61b8-4dda-4dae-8750-29ff0b4ee447)
+
 
 
